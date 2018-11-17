@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Dockerfile配置用法 | °．·°∴Lín。</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dockerfile配置用法">
+<meta property="og:url" content="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/index.html">
+<meta property="og:site_name" content="°．·°∴Lín。">
+<meta property="og:description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-17T14:26:23.833Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dockerfile配置用法">
+<meta name="twitter:description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+  
+    <link rel="alternative" href="/atom.xml" title="°．·°∴Lín。" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head></html>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">°．·°∴Lín。</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">laifulin</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name="tn" type="hidden" value="bds">
+          <input name="cl" type="hidden" value="3">
+          <input name="ct" type="hidden" value="2097152">
+          <input type="hidden" name="si" value="laifulin.github.io">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Dockerfile配置用法" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/17/Dockerfile配置用法/" class="article-date">
+  <time datetime="2018-11-17T14:25:47.000Z" itemprop="datePublished">2018-11-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Dockerfile配置用法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dockerfile是由一些列指令和参数构成的脚本</span><br><span class="line">Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像</span><br><span class="line">Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</span><br><span class="line">’<span class="comment">#’ 为 Dockerfile 中的注释</span></span><br></pre></td></tr></table></figure>
+<h3 id="Dockerfile-指令"><a href="#Dockerfile-指令" class="headerlink" title="Dockerfile 指令"></a>Dockerfile 指令</h3><h4 id="镜像操作指令"><a href="#镜像操作指令" class="headerlink" title="镜像操作指令"></a>镜像操作指令</h4><ol>
+<li>FROM </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定基础镜像，必须为第一个命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">　　FROM &lt;image&gt;</span><br><span class="line">　　FROM &lt;image&gt;:&lt;tag&gt;</span><br><span class="line">　　FROM &lt;image&gt;@&lt;digest&gt;</span><br><span class="line">示例：</span><br><span class="line">　　FROM mysql:5.6</span><br><span class="line">注：</span><br><span class="line">　　tag或digest是可选的，如果不使用这两个值时，会使用latest版本的基础镜像</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>MAINTAINER</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">描述镜像的创建者 一般为email and username</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MAINTAINER &lt;name&gt; &lt;email&gt;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>RUN</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RUN命令是一个常用的命令，执行完成之后会成为一个新的镜像，这里也是指镜像的分层构建</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>EXPOSE</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定Docker服务器容器对外映射的容器端口号，在docker run -p的时候生效</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    EXPOSE &lt;port&gt; [&lt;port&gt;...]</span><br><span class="line">示例：</span><br><span class="line">    EXPOSE 80 443</span><br><span class="line">    EXPOSE 8080</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>ENV</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">设置环境变量,它主要是为后续的RUN指令提供一个环境变量</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    ENV &lt;key&gt; &lt;value&gt;</span><br><span class="line">    ENV &lt;key&gt;=&lt;value&gt; ...</span><br><span class="line">示例：</span><br><span class="line">    ENV param_1 value_1</span><br><span class="line">    ENV param_2 value_1 value_2</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>ADD</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">复制本机文件或目录或远程文件，添加到指定的容器目录</span><br><span class="line">tar类型文件会自动解压，可以访问网络资源，类似wget</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    ADD &lt;src&gt;... &lt;dest&gt;</span><br><span class="line">    ADD [<span class="string">"&lt;src&gt;"</span>,... <span class="string">"&lt;dest&gt;"</span>] 用于支持包含空格的路径</span><br><span class="line">示例：</span><br><span class="line">    ADD hom* /<span class="built_in">test</span>/          <span class="comment"># 添加所有以"hom"开头的文件到/test目录</span></span><br><span class="line">    ADD hom?.txt /<span class="built_in">test</span>/      <span class="comment"># ? 替代一个单字符,例如："home.txt"</span></span><br><span class="line">    ADD <span class="built_in">test</span> relativeDir/     <span class="comment"># 添加 "test" 到 `WORKDIR`/relativeDir/</span></span><br><span class="line">    ADD <span class="built_in">test</span> /absoluteDir/    <span class="comment"># 添加 "test" 到 /absoluteDir/</span></span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>COPY</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">功能类似ADD，但是是不会自动解压文件，也不能访问网络资源URL</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD &lt;src&gt;... &lt;dest&gt;</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>VOLUME</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用来向基于镜像创建的容器添加卷</span><br><span class="line">是在container中创建一个挂载点，我们可以将本地的一个文件卷挂载在container下面，这样我们在container的data目录下的操作就和在本地卷的操作是一样的。</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// VOLUME 主机目录 容器目录</span><br><span class="line">VOLUME /nginx/conf /nginx/conf</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li>USER</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定该镜像以什么样的用户去执行</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USER &lt;user&gt;</span><br></pre></td></tr></table></figure>
+<ol start="10">
+<li>WORKDIR</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在构建镜像时，指定镜像的工作目录，之后的命令都是基于此工作目录，如果不存在，则会创建目录</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WORKDIR /usr/<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+<ol start="11">
+<li>ONBUILD</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">可以为镜像添加触发器</span><br><span class="line">当我们在一个Dockerfile文件中加上ONBUILD指令，该指令对利用该Dockerfile构建镜像（比如为A镜像）不会产生实质性影响。</span><br><span class="line"></span><br><span class="line">但是当我们编写一个新的Dockerfile文件来基于A镜像构建一个镜像（比如为B镜像）时，这时构造A镜像的Dockerfile文件中的ONBUILD指令就生效了，在构建B镜像的过程中，首先会执行ONBUILD指令指定的指令，然后才会执行其它指令</span><br></pre></td></tr></table></figure>
+<h4 id="容器启动时执行指令"><a href="#容器启动时执行指令" class="headerlink" title="容器启动时执行指令"></a>容器启动时执行指令</h4><ol>
+<li>CMD</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用于指定一个容器启动是要运行的命令(Dockerfile中只能指定一条CMD指令) RUN是镜像被构建时要运行的命令</span><br><span class="line">CMD的命令会被 docker run 的命令覆盖</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -i -t [image] [command]   文件里可以使用 CMD[&quot;/bin/bash&quot;]替代</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>ENTRYPOINT</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">配置容器启动后执行的命令，并且不可被 docker run 提供的参数覆盖</span><br><span class="line">每个 Dockerfile 中只能有一个 ENTRYPOINT，当指定多个时，只有最后一个起效</span><br><span class="line">结合CMD命令和ENTRYPOINT命令使用时，可以从CMD命令中移除“application”而仅仅保留参数，参数将传递给ENTRYPOINT命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ENTRYPOINT [<span class="string">"/user/sbin/nginx"</span>]</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjoljpv7z0000ud332pqhru99" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/11/17/Docker常用命令/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Docker常用命令</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2018/11/17/Dockerfile配置用法/" data-title="Dockerfile配置用法" data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/"></div>
+  </section>
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/11/17/Dockerfile配置用法/">Dockerfile配置用法</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/17/Docker常用命令/">Docker常用命令</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/11/Hexo-Github-搭建个人博客/">Hexo Github 搭建个人博客</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/04/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="https://github.com/laifulin" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="326620938" target="_blank">QQ</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 °．·°∴Lín。<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"°．·°∴Lín。"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>

@@ -74,6 +74,264 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-Dockerfile配置用法" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/17/Dockerfile配置用法/" class="article-date">
+  <time datetime="2018-11-17T14:25:47.000Z" itemprop="datePublished">2018-11-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/17/Dockerfile配置用法/">Dockerfile配置用法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dockerfile是由一些列指令和参数构成的脚本</span><br><span class="line">Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像</span><br><span class="line">Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</span><br><span class="line">’<span class="comment">#’ 为 Dockerfile 中的注释</span></span><br></pre></td></tr></table></figure>
+<h3 id="Dockerfile-指令"><a href="#Dockerfile-指令" class="headerlink" title="Dockerfile 指令"></a>Dockerfile 指令</h3><h4 id="镜像操作指令"><a href="#镜像操作指令" class="headerlink" title="镜像操作指令"></a>镜像操作指令</h4><ol>
+<li>FROM </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定基础镜像，必须为第一个命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">　　FROM &lt;image&gt;</span><br><span class="line">　　FROM &lt;image&gt;:&lt;tag&gt;</span><br><span class="line">　　FROM &lt;image&gt;@&lt;digest&gt;</span><br><span class="line">示例：</span><br><span class="line">　　FROM mysql:5.6</span><br><span class="line">注：</span><br><span class="line">　　tag或digest是可选的，如果不使用这两个值时，会使用latest版本的基础镜像</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>MAINTAINER</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">描述镜像的创建者 一般为email and username</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MAINTAINER &lt;name&gt; &lt;email&gt;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>RUN</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RUN命令是一个常用的命令，执行完成之后会成为一个新的镜像，这里也是指镜像的分层构建</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>EXPOSE</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定Docker服务器容器对外映射的容器端口号，在docker run -p的时候生效</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    EXPOSE &lt;port&gt; [&lt;port&gt;...]</span><br><span class="line">示例：</span><br><span class="line">    EXPOSE 80 443</span><br><span class="line">    EXPOSE 8080</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>ENV</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">设置环境变量,它主要是为后续的RUN指令提供一个环境变量</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    ENV &lt;key&gt; &lt;value&gt;</span><br><span class="line">    ENV &lt;key&gt;=&lt;value&gt; ...</span><br><span class="line">示例：</span><br><span class="line">    ENV param_1 value_1</span><br><span class="line">    ENV param_2 value_1 value_2</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>ADD</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">复制本机文件或目录或远程文件，添加到指定的容器目录</span><br><span class="line">tar类型文件会自动解压，可以访问网络资源，类似wget</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">格式：</span><br><span class="line">    ADD &lt;src&gt;... &lt;dest&gt;</span><br><span class="line">    ADD [<span class="string">"&lt;src&gt;"</span>,... <span class="string">"&lt;dest&gt;"</span>] 用于支持包含空格的路径</span><br><span class="line">示例：</span><br><span class="line">    ADD hom* /<span class="built_in">test</span>/          <span class="comment"># 添加所有以"hom"开头的文件到/test目录</span></span><br><span class="line">    ADD hom?.txt /<span class="built_in">test</span>/      <span class="comment"># ? 替代一个单字符,例如："home.txt"</span></span><br><span class="line">    ADD <span class="built_in">test</span> relativeDir/     <span class="comment"># 添加 "test" 到 `WORKDIR`/relativeDir/</span></span><br><span class="line">    ADD <span class="built_in">test</span> /absoluteDir/    <span class="comment"># 添加 "test" 到 /absoluteDir/</span></span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>COPY</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">功能类似ADD，但是是不会自动解压文件，也不能访问网络资源URL</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ADD &lt;src&gt;... &lt;dest&gt;</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>VOLUME</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用来向基于镜像创建的容器添加卷</span><br><span class="line">是在container中创建一个挂载点，我们可以将本地的一个文件卷挂载在container下面，这样我们在container的data目录下的操作就和在本地卷的操作是一样的。</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// VOLUME 主机目录 容器目录</span><br><span class="line">VOLUME /nginx/conf /nginx/conf</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li>USER</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定该镜像以什么样的用户去执行</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USER &lt;user&gt;</span><br></pre></td></tr></table></figure>
+<ol start="10">
+<li>WORKDIR</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在构建镜像时，指定镜像的工作目录，之后的命令都是基于此工作目录，如果不存在，则会创建目录</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WORKDIR /usr/<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+<ol start="11">
+<li>ONBUILD</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">可以为镜像添加触发器</span><br><span class="line">当我们在一个Dockerfile文件中加上ONBUILD指令，该指令对利用该Dockerfile构建镜像（比如为A镜像）不会产生实质性影响。</span><br><span class="line"></span><br><span class="line">但是当我们编写一个新的Dockerfile文件来基于A镜像构建一个镜像（比如为B镜像）时，这时构造A镜像的Dockerfile文件中的ONBUILD指令就生效了，在构建B镜像的过程中，首先会执行ONBUILD指令指定的指令，然后才会执行其它指令</span><br></pre></td></tr></table></figure>
+<h4 id="容器启动时执行指令"><a href="#容器启动时执行指令" class="headerlink" title="容器启动时执行指令"></a>容器启动时执行指令</h4><ol>
+<li>CMD</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">用于指定一个容器启动是要运行的命令(Dockerfile中只能指定一条CMD指令) RUN是镜像被构建时要运行的命令</span><br><span class="line">CMD的命令会被 docker run 的命令覆盖</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -i -t [image] [command]   文件里可以使用 CMD[&quot;/bin/bash&quot;]替代</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>ENTRYPOINT</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">配置容器启动后执行的命令，并且不可被 docker run 提供的参数覆盖</span><br><span class="line">每个 Dockerfile 中只能有一个 ENTRYPOINT，当指定多个时，只有最后一个起效</span><br><span class="line">结合CMD命令和ENTRYPOINT命令使用时，可以从CMD命令中移除“application”而仅仅保留参数，参数将传递给ENTRYPOINT命令</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ENTRYPOINT [<span class="string">"/user/sbin/nginx"</span>]</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjoljpv7z0000ud332pqhru99" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-Docker常用命令" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/17/Docker常用命令/" class="article-date">
+  <time datetime="2018-11-17T14:23:37.000Z" itemprop="datePublished">2018-11-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/17/Docker常用命令/">Docker常用命令</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="镜像管理类命令"><a href="#镜像管理类命令" class="headerlink" title="镜像管理类命令"></a>镜像管理类命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查看命令参数：docker [<span class="built_in">command</span>] --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<h4 id="docker-build-命令"><a href="#docker-build-命令" class="headerlink" title="docker build 命令"></a>docker build 命令</h4><p>docker build 命令用于使用 Dockerfile 创建镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build [OPTIONS] PATH | URL | -</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> 在 Docker 守护进程执行 Dockerfile 中的指令前，首先会对 Dockerfile 进行语法检查，有语法错误时会返回</p>
+</blockquote>
+<ul>
+<li>-f :指定要使用的Dockerfile路径；</li>
+<li>–pull :尝试去更新镜像的新版本；</li>
+<li>–tag, -t: 镜像的名字及标签，通常 name:tag 或者 name </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// **使用当前目录下的Dockerfile文件**，创建标签为lin/ubuntu:v1的镜像</span><br><span class="line">docker build -t lin/ubuntu:v1 .</span><br><span class="line"></span><br><span class="line">// 通过 -f 指定Dockerfile 文件的位置，创建镜像</span><br><span class="line">docker build -f /path/to/a/Dockerfile .</span><br></pre></td></tr></table></figure>
+<h4 id="docker-images"><a href="#docker-images" class="headerlink" title="docker images"></a>docker images</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images [OPTIONS] [REPOSITORY[:TAG]]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-a :列出本地所有的镜像/不加默认展示所以镜像</li>
+<li>-f :显示满足条件的镜像；</li>
+<li>-q :只显示镜像ID</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像列表</span><br><span class="line">docker images </span><br><span class="line"></span><br><span class="line">// 列出REPOSITORY为centos的所以镜像</span><br><span class="line">docker images centos</span><br></pre></td></tr></table></figure>
+<h4 id="docker-rmi"><a href="#docker-rmi" class="headerlink" title="docker rmi"></a>docker rmi</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi [OPTIONS] IMAGE [IMAGE...]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-f :强制删除</li>
+<li>–no-prune :不移除该镜像的过程镜像，默认移除</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 强制删除本地镜像</span><br><span class="line">docker rmi -f centos</span><br></pre></td></tr></table></figure>
+<h4 id="docker-tag"><a href="#docker-tag" class="headerlink" title="docker tag"></a>docker tag</h4><p>标记本地镜像，将其归入某一仓库<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag IMAGE_ID REPOSITORY:TAG</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 修改本地镜像标签</span><br><span class="line">docker tag 75835a67d134 daocloud.io/centos:latest1</span><br></pre></td></tr></table></figure>
+<h4 id="docker-history"><a href="#docker-history" class="headerlink" title="docker history"></a>docker history</h4><p>查看指定镜像的创建历史<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> [OPTIONS] IMAGE</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-H :以可读的格式打印镜像大小和日期，默认为true</li>
+<li>—no-trunc :显示完整的提交记录</li>
+<li>-q :仅列出提交记录ID</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像75835a67d134的创建历史</span><br><span class="line">docker history -q 75835a67d134</span><br></pre></td></tr></table></figure>
+<h3 id="容器操作"><a href="#容器操作" class="headerlink" title="容器操作"></a>容器操作</h3><h4 id="docker-ps"><a href="#docker-ps" class="headerlink" title="docker ps"></a>docker ps</h4><p>列出容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps [OPTIONS]  // 默认列出运行中的容器</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-a :显示所有的容器，包括未运行的。</p>
+</li>
+<li><p>-f :根据条件过滤显示的内容。</p>
+</li>
+<li><p>–format :指定返回值的模板文件。</p>
+</li>
+<li><p>-l :显示最近创建的容器。</p>
+</li>
+<li><p>-n :列出最近创建的n个容器。</p>
+</li>
+<li><p>–no-trunc :不截断输出。</p>
+</li>
+<li><p>-q :静默模式，只显示容器编号。</p>
+</li>
+<li><p>-s :显示总的文件大小</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//列出所有运行和未运行的容器</span><br><span class="line">docker ps -a</span><br></pre></td></tr></table></figure>
+<h4 id="docker-attach"><a href="#docker-attach" class="headerlink" title="docker attach"></a>docker attach</h4><p>连接到正在运行中的容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
+<h4 id="docker-run"><a href="#docker-run" class="headerlink" title="docker run"></a>docker run</h4><p>创建一个新的容器并运行一个命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>-i: 以交互模式运行容器，通常与 -t 同时使用</li>
+<li>-p: 端口映射，格式为：主机(宿主)端口:容器端口</li>
+<li>-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用</li>
+<li>–name=”nginx-lb”: 为容器指定一个名称</li>
+</ul>
+<h4 id="docker-start-stop-restart"><a href="#docker-start-stop-restart" class="headerlink" title="docker start/stop/restart"></a>docker start/stop/restart</h4><p>启动/停止/重启一个容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker start/stop/restart [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
+<h4 id="docker-rm"><a href="#docker-rm" class="headerlink" title="docker rm"></a>docker rm</h4><p>删除一个或多少容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm [OPTIONS] CONTAINER [CONTAINER...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-f :通过SIGKILL信号强制删除一个运行中的容器</p>
+</li>
+<li><p>-l :移除容器间的网络连接，而非容器本身</p>
+</li>
+<li><p>-v :-v 删除与容器关联的卷</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm mynginx</span><br></pre></td></tr></table></figure>
+<h4 id="docker-exec"><a href="#docker-exec" class="headerlink" title="docker exec"></a>docker exec</h4><p>在运行的容器中执行命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> [OPTIONS] CONTAINER COMMAND [ARG...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-d :分离模式: 在后台运行</p>
+</li>
+<li><p>-i :即使没有附加也保持STDIN 打开</p>
+</li>
+<li><p>-t :分配一个伪终端</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i -t  mynginx /bin/bash</span><br></pre></td></tr></table></figure>
+<h3 id="更换docker仓库地址-–-如更新阿里云仓库"><a href="#更换docker仓库地址-–-如更新阿里云仓库" class="headerlink" title="更换docker仓库地址 – 如更新阿里云仓库"></a>更换docker仓库地址 – 如更新阿里云仓库</h3><blockquote>
+<p>   docker-machine ssh [machine-name] 进入VM bash</p>
+</blockquote>
+<blockquote>
+<p>   sudo vi /var/lib/boot2docker/profile 修改配置文件</p>
+</blockquote>
+<blockquote>
+<p>   在–label provider=virtualbox的下一行添加–registry-mirror <a href="https://xxxxxxxx.mirror.aliyuncs.com" target="_blank" rel="noopener">https://xxxxxxxx.mirror.aliyuncs.com</a></p>
+</blockquote>
+<blockquote>
+<p>   重启docker服务:/etc/init.d/docker restart 或者重启VM docker-machine restart</p>
+</blockquote>
+<h3 id="docker-machine"><a href="#docker-machine" class="headerlink" title="docker-machine"></a>docker-machine</h3><blockquote>
+<pre><code>查看宿主机ip docker-machine ip default
+</code></pre></blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjoljpv880001ud33e72ht5m2" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2018/11/17/Docker常用命令/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-Hexo-Github-搭建个人博客" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/11/11/Hexo-Github-搭建个人博客/" class="article-date">
@@ -153,7 +411,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjod2x8bq0001ld33txl26ar1" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjoljpv900007ud33mvfhx92a" class="article-share-link">分享到</a>
       
 
       
@@ -167,6 +425,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -206,7 +465,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/04/hello-world/" data-id="cjod2x8bf0000ld33jcajarzw" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/04/hello-world/" data-id="cjoljpv8n0006ud33kwbiy56m" class="article-share-link">分享到</a>
       
 
       
@@ -218,6 +477,7 @@
   </div>
   
 </article>
+
 
 
   
@@ -232,7 +492,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -241,7 +501,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a>
+      <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a>
     </div>
   </div>
 
@@ -250,7 +510,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">2</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">4</span></li></ul>
     </div>
   </div>
 
@@ -260,6 +520,14 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/11/17/Dockerfile配置用法/">Dockerfile配置用法</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/17/Docker常用命令/">Docker常用命令</a>
+          </li>
         
           <li>
             <a href="/2018/11/11/Hexo-Github-搭建个人博客/">Hexo Github 搭建个人博客</a>
