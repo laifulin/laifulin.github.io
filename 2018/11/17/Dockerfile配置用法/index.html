@@ -6,18 +6,18 @@
   
   <title>Dockerfile配置用法 | °．·°∴Lín。</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+  <meta name="description" content="Dockerfile 指令1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
 <meta name="keywords" content="docker">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dockerfile配置用法">
 <meta property="og:url" content="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/index.html">
 <meta property="og:site_name" content="°．·°∴Lín。">
-<meta property="og:description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+<meta property="og:description" content="Dockerfile 指令1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-17T14:26:23.833Z">
+<meta property="og:updated_time" content="2018-11-17T14:37:30.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dockerfile配置用法">
-<meta name="twitter:description" content="1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 Dockerfile 指令镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
+<meta name="twitter:description" content="Dockerfile 指令1234Dockerfile是由一些列指令和参数构成的脚本Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令’#’ 为 Dockerfile 中的注释 镜像操作指令 FROM   1指定基础镜像，必须为第一个命令 12345678格式：　　FR">
   
     <link rel="alternative" href="/atom.xml" title="°．·°∴Lín。" type="application/atom+xml">
   
@@ -95,8 +95,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dockerfile是由一些列指令和参数构成的脚本</span><br><span class="line">Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像</span><br><span class="line">Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</span><br><span class="line">’<span class="comment">#’ 为 Dockerfile 中的注释</span></span><br></pre></td></tr></table></figure>
-<h3 id="Dockerfile-指令"><a href="#Dockerfile-指令" class="headerlink" title="Dockerfile 指令"></a>Dockerfile 指令</h3><h4 id="镜像操作指令"><a href="#镜像操作指令" class="headerlink" title="镜像操作指令"></a>镜像操作指令</h4><ol>
+        <h3 id="Dockerfile-指令"><a href="#Dockerfile-指令" class="headerlink" title="Dockerfile 指令"></a>Dockerfile 指令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dockerfile是由一些列指令和参数构成的脚本</span><br><span class="line">Docker通过读取Dockerfile中的指令应用于基础镜像并最终创建一个新的镜像</span><br><span class="line">Dockerfile 一般分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</span><br><span class="line">’<span class="comment">#’ 为 Dockerfile 中的注释</span></span><br></pre></td></tr></table></figure>
+<h4 id="镜像操作指令"><a href="#镜像操作指令" class="headerlink" title="镜像操作指令"></a>镜像操作指令</h4><ol>
 <li>FROM </li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指定基础镜像，必须为第一个命令</span><br></pre></td></tr></table></figure>
@@ -164,7 +164,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjoljz78s0000zg33c2v2vmrc" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjolk3zq400001y33f4k8zlmb" class="article-share-link">分享到</a>
       
 
       
