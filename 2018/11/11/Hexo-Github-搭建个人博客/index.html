@@ -6,18 +6,18 @@
   
   <title>Hexo Github 搭建个人博客 | °．·°∴Lín。</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
-<meta name="keywords" content="dubbo">
+  <meta name="description" content="每日进步一点点">
+<meta name="keywords" content="其他">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo Github 搭建个人博客">
 <meta property="og:url" content="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/index.html">
 <meta property="og:site_name" content="°．·°∴Lín。">
-<meta property="og:description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
+<meta property="og:description" content="每日进步一点点">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-11T15:55:23.834Z">
+<meta property="og:updated_time" content="2018-11-18T10:22:01.740Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo Github 搭建个人博客">
-<meta name="twitter:description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
+<meta name="twitter:description" content="每日进步一点点">
   
     <link rel="alternative" href="/atom.xml" title="°．·°∴Lín。" type="application/atom+xml">
   
@@ -95,64 +95,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="dubbo群容错与负载均衡策略"><a href="#dubbo群容错与负载均衡策略" class="headerlink" title="dubbo群容错与负载均衡策略"></a>dubbo群容错与负载均衡策略</h2><h3 id="一、dubbo容错策略"><a href="#一、dubbo容错策略" class="headerlink" title="一、dubbo容错策略"></a>一、dubbo容错策略</h3><h3 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h3><blockquote>
-<p>  进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 <strong>failover</strong></p>
-</blockquote>
-<h3 id="2、容错模式"><a href="#2、容错模式" class="headerlink" title="2、容错模式"></a>2、容错模式</h3><ul>
-<li>2.1、<strong>Failover Cluster：失败重试</strong></li>
-</ul>
-<blockquote>
-<p>  当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者的服务器重试。这个模式通常适用于读操作或者具有幂等的写操作</p>
-</blockquote>
-<blockquote>
-<pre><code>&lt;dubbo:reference retries=&quot;2&quot; /&gt;
-</code></pre></blockquote>
-<blockquote>
-<p>  如上配置，如果第一个调用失败后会重试两次，所有共有3次调用</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public Result doInvoke(Invocation invocation, final List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">   	List&lt;Invoker&lt;T&gt;&gt; copyinvokers = invokers;</span><br><span class="line">   	checkInvokers(copyinvokers, invocation);</span><br><span class="line">   	// 重试次数</span><br><span class="line">       int len = getUrl().getMethodParameter(invocation.getMethodName(), Constants.RETRIES_KEY, Constants.DEFAULT_RETRIES) + 1;</span><br><span class="line">       if (len &lt;= 0) &#123;</span><br><span class="line">           len = 1;</span><br><span class="line">       &#125;</span><br><span class="line">       // retry loop.</span><br><span class="line">       RpcException le = null; // last exception.</span><br><span class="line">       List&lt;Invoker&lt;T&gt;&gt; invoked = new ArrayList&lt;Invoker&lt;T&gt;&gt;(copyinvokers.size()); // invoked invokers.</span><br><span class="line">       Set&lt;String&gt; providers = new HashSet&lt;String&gt;(len);</span><br><span class="line">       for (int i = 0; i &lt; len; i++) &#123;</span><br><span class="line">       	//重试时，进行重新选择，避免重试时invoker列表已发生变化.</span><br><span class="line">       	//注意：如果列表发生了变化，那么invoked判断会失效，因为invoker示例已经改变</span><br><span class="line">       	if (i &gt; 0) &#123;</span><br><span class="line">       		checkWheatherDestoried();</span><br><span class="line">       		copyinvokers = list(invocation);</span><br><span class="line">       		//重新检查一下</span><br><span class="line">       		checkInvokers(copyinvokers, invocation);</span><br><span class="line">       	&#125;</span><br><span class="line">           Invoker&lt;T&gt; invoker = select(loadbalance, invocation, copyinvokers, invoked);</span><br><span class="line">           invoked.add(invoker);</span><br><span class="line">           RpcContext.getContext().setInvokers((List)invoked);</span><br><span class="line">           try &#123;</span><br><span class="line">               Result result = invoker.invoke(invocation);</span><br><span class="line">               return result;</span><br><span class="line">           &#125; catch (RpcException e) &#123;</span><br><span class="line">               if (e.isBiz()) &#123; // biz exception.</span><br><span class="line">                   throw e;</span><br><span class="line">               &#125;</span><br><span class="line">               le = e;</span><br><span class="line">           &#125; catch (Throwable e) &#123;</span><br><span class="line">               le = new RpcException(e.getMessage(), e);</span><br><span class="line">           &#125; finally &#123;</span><br><span class="line">               providers.add(invoker.getUrl().getAddress());</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2.2、<strong>Failfast Cluster：快速失败</strong></li>
-</ul>
-<blockquote>
-<p> 当服务消费方调用服务提供者失败后，立即报错，也就是只调用一次。通常这种模式用于非幂等性的写操作。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public Result doInvoke(Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">    checkInvokers(invokers, invocation);</span><br><span class="line">    Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, null);</span><br><span class="line">    try &#123;</span><br><span class="line">        return invoker.invoke(invocation);</span><br><span class="line">    &#125; catch (Throwable e) &#123;</span><br><span class="line">        if (e instanceof RpcException &amp;&amp; ((RpcException)e).isBiz()) &#123; // biz exception.</span><br><span class="line">            throw (RpcException) e;</span><br><span class="line">        &#125;</span><br><span class="line">        throw new RpcException(e instanceof RpcException ? ((RpcException)e).getCode() : 0, &quot;Failfast invoke providers &quot; + invoker.getUrl() + &quot; &quot; + loadbalance.getClass().getSimpleName() + &quot; select from all providers &quot; + invokers + &quot; for service &quot; + getInterface().getName() + &quot; method &quot; + invocation.getMethodName() + &quot; on consumer &quot; + NetUtils.getLocalHost() + &quot; use dubbo version &quot; + Version.getVersion() + &quot;, but no luck to perform the invocation. Last error is: &quot; + e.getMessage(), e.getCause() != null ? e.getCause() : e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2.3、<strong>Failsafe Cluster：失败安全</strong></li>
-</ul>
-<blockquote>
-<p> 失败安全，出现异常时，直接忽略。通常用于写入审计日志等操作。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public Result doInvoke(Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            checkInvokers(invokers, invocation);</span><br><span class="line">            Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, null);</span><br><span class="line">            return invoker.invoke(invocation);</span><br><span class="line">        &#125; catch (Throwable e) &#123;</span><br><span class="line">            logger.error(&quot;Failsafe ignore exception: &quot; + e.getMessage(), e);</span><br><span class="line">            return new RpcResult(); // ignore</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2.4、<strong>Failback Cluster</strong></li>
-</ul>
-<blockquote>
-<p> 失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">protected Result doInvoke(Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        checkInvokers(invokers, invocation);</span><br><span class="line">        Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, null);</span><br><span class="line">        return invoker.invoke(invocation);</span><br><span class="line">    &#125; catch (Throwable e) &#123;</span><br><span class="line">        logger.error(&quot;Failback to invoke method &quot; + invocation.getMethodName() + &quot;, wait for retry in background. Ignored exception: &quot;</span><br><span class="line">                             + e.getMessage() + &quot;, &quot;, e);</span><br><span class="line">        addFailed(invocation, this);</span><br><span class="line">        return new RpcResult(); // ignore</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// 创建一个定长线程池，支持定时及周期性任务执行</span><br><span class="line">private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2, new NamedThreadFactory(&quot;failback-cluster-timer&quot;, true));</span><br><span class="line"></span><br><span class="line">private void addFailed(Invocation invocation, AbstractClusterInvoker&lt;?&gt; router) &#123;</span><br><span class="line">       if (retryFuture == null) &#123;</span><br><span class="line">           synchronized (this) &#123;</span><br><span class="line">               if (retryFuture == null) &#123;</span><br><span class="line">                   retryFuture = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">                       public void run() &#123;</span><br><span class="line">                           // 收集统计信息</span><br><span class="line">                           try &#123;</span><br><span class="line">                               retryFailed();</span><br><span class="line">                           &#125; catch (Throwable t) &#123; // 防御性容错</span><br><span class="line">                               logger.error(&quot;Unexpected error occur at collect statistic&quot;, t);</span><br><span class="line">                           &#125;</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;, RETRY_FAILED_PERIOD, RETRY_FAILED_PERIOD, TimeUnit.MILLISECONDS);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       failed.put(invocation, router);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void retryFailed() &#123;</span><br><span class="line">    if (failed.size() == 0) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    for (Map.Entry&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt; entry : new HashMap&lt;Invocation, AbstractClusterInvoker&lt;?&gt;&gt;(</span><br><span class="line">                                                                                                                     failed).entrySet()) &#123;</span><br><span class="line">        Invocation invocation = entry.getKey();</span><br><span class="line">        Invoker&lt;?&gt; invoker = entry.getValue();</span><br><span class="line">        try &#123;</span><br><span class="line">            invoker.invoke(invocation);</span><br><span class="line">            failed.remove(invocation);</span><br><span class="line">        &#125; catch (Throwable e) &#123;</span><br><span class="line">            logger.error(&quot;Failed retry to invoke method &quot; + invocation.getMethodName() + &quot;, waiting again.&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2.5、<strong>Forking Cluster</strong></li>
-</ul>
-<blockquote>
-<p> 并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks=”2” 来设置最大并行数。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">@SuppressWarnings(&#123; &quot;unchecked&quot;, &quot;rawtypes&quot; &#125;)</span><br><span class="line">   public Result doInvoke(final Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">       checkInvokers(invokers, invocation);</span><br><span class="line">       final List&lt;Invoker&lt;T&gt;&gt; selected;</span><br><span class="line">       final int forks = getUrl().getParameter(Constants.FORKS_KEY, Constants.DEFAULT_FORKS);</span><br><span class="line">       final int timeout = getUrl().getParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);</span><br><span class="line">       if (forks &lt;= 0 || forks &gt;= invokers.size()) &#123;</span><br><span class="line">           selected = invokers;</span><br><span class="line">       &#125; else &#123;</span><br><span class="line">           selected = new ArrayList&lt;Invoker&lt;T&gt;&gt;();</span><br><span class="line">           for (int i = 0; i &lt; forks; i++) &#123;</span><br><span class="line">               //在invoker列表(排除selected)后,如果没有选够,则存在重复循环问题.见select实现.</span><br><span class="line">               Invoker&lt;T&gt; invoker = select(loadbalance, invocation, invokers, selected);</span><br><span class="line">               if(!selected.contains(invoker))&#123;//防止重复添加invoker</span><br><span class="line">                   selected.add(invoker);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       RpcContext.getContext().setInvokers((List)selected);</span><br><span class="line">       final AtomicInteger count = new AtomicInteger();</span><br><span class="line">       final BlockingQueue&lt;Object&gt; ref = new LinkedBlockingQueue&lt;Object&gt;();</span><br><span class="line">       for (final Invoker&lt;T&gt; invoker : selected) &#123;</span><br><span class="line">           executor.execute(new Runnable() &#123;</span><br><span class="line">               public void run() &#123;</span><br><span class="line">                   try &#123;</span><br><span class="line">                       Result result = invoker.invoke(invocation);</span><br><span class="line">                       ref.offer(result);</span><br><span class="line">                   &#125; catch(Throwable e) &#123;</span><br><span class="line">                       int value = count.incrementAndGet();</span><br><span class="line">                       if (value &gt;= selected.size()) &#123;</span><br><span class="line">                           ref.offer(e);</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;);</span><br><span class="line">       &#125;</span><br><span class="line">       try &#123;</span><br><span class="line">           Object ret = ref.poll(timeout, TimeUnit.MILLISECONDS);</span><br><span class="line">           if (ret instanceof Throwable) &#123;</span><br><span class="line">               Throwable e = (Throwable) ret;</span><br><span class="line">               throw new RpcException(e instanceof RpcException ? ((RpcException)e).getCode() : 0, &quot;Failed to forking invoke provider &quot; + selected + &quot;, but no luck to perform the invocation. Last error is: &quot; + e.getMessage(), e.getCause() != null ? e.getCause() : e);</span><br><span class="line">           &#125;</span><br><span class="line">           return (Result) ret;</span><br><span class="line">       &#125; catch (InterruptedException e) &#123;</span><br><span class="line">           throw new RpcException(&quot;Failed to forking invoke provider &quot; + selected + &quot;, but no luck to perform the invocation. Last error is: &quot; + e.getMessage(), e);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2.6、<strong>Broadcast Cluster</strong></li>
-</ul>
-<blockquote>
-<p> 广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@SuppressWarnings(&#123; &quot;unchecked&quot;, &quot;rawtypes&quot; &#125;)</span><br><span class="line">  public Result doInvoke(final Invocation invocation, List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance) throws RpcException &#123;</span><br><span class="line">      checkInvokers(invokers, invocation);</span><br><span class="line">      RpcContext.getContext().setInvokers((List)invokers);</span><br><span class="line">      RpcException exception = null;</span><br><span class="line">      Result result = null;</span><br><span class="line">      for (Invoker&lt;T&gt; invoker: invokers) &#123;</span><br><span class="line">          try &#123;</span><br><span class="line">              result = invoker.invoke(invocation);</span><br><span class="line">          &#125; catch (RpcException e) &#123;</span><br><span class="line">              exception = e;</span><br><span class="line">              logger.warn(e.getMessage(), e);</span><br><span class="line">          &#125; catch (Throwable e) &#123;</span><br><span class="line">              exception = new RpcException(e.getMessage(), e);</span><br><span class="line">              logger.warn(e.getMessage(), e);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      if (exception != null) &#123;</span><br><span class="line">          throw exception;</span><br><span class="line">      &#125;</span><br><span class="line">      return result;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+        
       
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjolkf1bt00077s3310q81hg5" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjomqfe3n0003y333f8cnayfn" class="article-share-link">分享到</a>
       
 
       
@@ -160,7 +108,7 @@
       
 
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dubbo/">dubbo</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/其他/">其他</a></li></ul>
 
     </footer>
   </div>
@@ -177,11 +125,6 @@
       </div>
     </a>
   
-  
-    <a href="/2018/11/04/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">Hello World</div>
-    </a>
   
 </nav>
 
@@ -203,7 +146,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dubbo/">dubbo</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -212,7 +155,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/dubbo/" style="font-size: 10px;">dubbo</a>
+      <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -233,6 +176,10 @@
       <ul>
         
           <li>
+            <a href="/2018/11/18/dubbo群容错与负载均衡策略/">dubbo群容错与负载均衡策略</a>
+          </li>
+        
+          <li>
             <a href="/2018/11/17/Dockerfile配置用法/">Dockerfile配置用法</a>
           </li>
         
@@ -242,10 +189,6 @@
         
           <li>
             <a href="/2018/11/11/Hexo-Github-搭建个人博客/">Hexo Github 搭建个人博客</a>
-          </li>
-        
-          <li>
-            <a href="/2018/11/04/hello-world/">Hello World</a>
           </li>
         
       </ul>
