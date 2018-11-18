@@ -4,20 +4,20 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
-  <title>dubbo群容错与负载均衡策略 | °．·°∴Lín。</title>
+  <title>Dubbo集群容错与负载均衡策略 | °．·°∴Lín。</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
+  <meta name="description" content="Dubbo集群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供">
 <meta name="keywords" content="dobbo">
 <meta property="og:type" content="article">
-<meta property="og:title" content="dubbo群容错与负载均衡策略">
+<meta property="og:title" content="Dubbo集群容错与负载均衡策略">
 <meta property="og:url" content="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/index.html">
 <meta property="og:site_name" content="°．·°∴Lín。">
-<meta property="og:description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
+<meta property="og:description" content="Dubbo集群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-18T10:22:01.731Z">
+<meta property="og:updated_time" content="2018-11-18T10:23:48.694Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="dubbo群容错与负载均衡策略">
-<meta name="twitter:description" content="dubbo群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供者">
+<meta name="twitter:title" content="Dubbo集群容错与负载均衡策略">
+<meta name="twitter:description" content="Dubbo集群容错与负载均衡策略一、dubbo容错策略1、概述   进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 failover  2、容错模式 2.1、Failover Cluster：失败重试     当服务消费方调用服务提供方的接口失败后自动切换到其他服务提供">
   
     <link rel="alternative" href="/atom.xml" title="°．·°∴Lín。" type="application/atom+xml">
   
@@ -87,7 +87,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      dubbo群容错与负载均衡策略
+      Dubbo集群容错与负载均衡策略
     </h1>
   
 
@@ -95,7 +95,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="dubbo群容错与负载均衡策略"><a href="#dubbo群容错与负载均衡策略" class="headerlink" title="dubbo群容错与负载均衡策略"></a>dubbo群容错与负载均衡策略</h2><h3 id="一、dubbo容错策略"><a href="#一、dubbo容错策略" class="headerlink" title="一、dubbo容错策略"></a>一、dubbo容错策略</h3><h3 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h3><blockquote>
+        <h2 id="Dubbo集群容错与负载均衡策略"><a href="#Dubbo集群容错与负载均衡策略" class="headerlink" title="Dubbo集群容错与负载均衡策略"></a>Dubbo集群容错与负载均衡策略</h2><h3 id="一、dubbo容错策略"><a href="#一、dubbo容错策略" class="headerlink" title="一、dubbo容错策略"></a>一、dubbo容错策略</h3><h3 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h3><blockquote>
 <p>  进行系统设计时，不仅要考虑正常逻辑下代码如何执行，还要考虑异常情况下代码逻辑是什么样的。当服务消费方调用服务提供方出现错误时该如何处理，dubbo提供了很多容错方案，缺省模式为 <strong>failover</strong></p>
 </blockquote>
 <h3 id="2、容错模式"><a href="#2、容错模式" class="headerlink" title="2、容错模式"></a>2、容错模式</h3><ul>
@@ -181,7 +181,7 @@
 
 
   <section id="comments">
-    <div id="ds-thread" class="ds-thread" data-thread-key="2018/11/18/dubbo群容错与负载均衡策略/" data-title="dubbo群容错与负载均衡策略" data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/"></div>
+    <div id="ds-thread" class="ds-thread" data-thread-key="2018/11/18/dubbo群容错与负载均衡策略/" data-title="Dubbo集群容错与负载均衡策略" data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/"></div>
   </section>
 
 </section>
@@ -224,7 +224,7 @@
       <ul>
         
           <li>
-            <a href="/2018/11/18/dubbo群容错与负载均衡策略/">dubbo群容错与负载均衡策略</a>
+            <a href="/2018/11/18/dubbo群容错与负载均衡策略/">Dubbo集群容错与负载均衡策略</a>
           </li>
         
           <li>
