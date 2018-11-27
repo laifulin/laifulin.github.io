@@ -74,6 +74,139 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-Mysql常用指令" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/28/Mysql常用指令/" class="article-date">
+  <time datetime="2018-11-27T17:12:27.000Z" itemprop="datePublished">2018-11-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/28/Mysql常用指令/">Mysql常用指令</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Mysql常用指令"><a href="#Mysql常用指令" class="headerlink" title="Mysql常用指令"></a>Mysql常用指令</h2><h3 id="连接数据库"><a href="#连接数据库" class="headerlink" title="连接数据库"></a>连接数据库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 强烈建议不带该-p[password]，</span><br><span class="line">$ mysql -h[adrress] -P[port] -u[username] -p[password] [db_name]</span><br></pre></td></tr></table></figure>
+<h3 id="查看所有库"><a href="#查看所有库" class="headerlink" title="查看所有库"></a>查看所有库</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show databases;</span><br><span class="line">+------------------------+</span><br><span class="line">| Database               |</span><br><span class="line">+------------------------+</span><br><span class="line">| db_name_1              |</span><br><span class="line">| db_name_2              |</span><br><span class="line">+------------------------+</span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span></span><br></pre></td></tr></table></figure>
+<h3 id="查看表"><a href="#查看表" class="headerlink" title="查看表"></a>查看表</h3><h4 id="查看所有表"><a href="#查看所有表" class="headerlink" title="查看所有表"></a>查看所有表</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show tables;</span><br><span class="line">+---------------------+</span><br><span class="line">| Tables_in_db_name_1 |</span><br><span class="line">+---------------------+</span><br><span class="line">| table_1             |</span><br><span class="line">+---------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span></span><br></pre></td></tr></table></figure>
+<h4 id="查看表状态"><a href="#查看表状态" class="headerlink" title="查看表状态"></a>查看表状态</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 查看所有表状态</span><br><span class="line">show table status from <span class="string">'[db_name]'</span> \G</span><br><span class="line"></span><br><span class="line">// 查看单个表状态</span><br><span class="line">show table status like <span class="string">'[table_name]'</span> \G</span><br><span class="line"></span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           Name: table_name // 表名称</span><br><span class="line">         Engine: InnoDB  // 表的存储引擎</span><br><span class="line">        Version: 10  // 版本</span><br><span class="line">     Row_format: Compact  // 行格式。对于MyISAM引擎，这可能是Dynamic，Fixed或Compressed。动态行的行长度可变，例如Varchar或Blob类型字段。固定行是指行长度不变，例如Char和Integer类型字段</span><br><span class="line">           Rows: 1207  // 表中的行数</span><br><span class="line"> Avg_row_length: 67  // 平均每行包括的字节数 </span><br><span class="line">    Data_length: 81920  // 整个表的数据量</span><br><span class="line">Max_data_length: 0  //  表可以容纳的最大数据量</span><br><span class="line">   Index_length: 49152  // 索引占用磁盘的空间大小 </span><br><span class="line">      Data_free: 0  // 对于MyISAM引擎，标识已分配，但现在未使用的空间，并且包含了已被删除行的空间</span><br><span class="line"> Auto_increment: 1208  // 下一个Auto_increment的值</span><br><span class="line">    Create_time: 2017-12-12 21:36:45  // 表的创建时间</span><br><span class="line">    Update_time: NULL  // 表的最近更新时间</span><br><span class="line">     Check_time: NULL  // 使用 check table 或myisamchk工具检查表的最近时间</span><br><span class="line">      Collation: utf8_general_ci  // 表的默认字符集和字符排序规则</span><br><span class="line">       Checksum: NULL  // 如果启用，则对整个表的内容计算时的校验和</span><br><span class="line"> Create_options:   // 表创建时的其他所有选项</span><br><span class="line">        Comment: 简介  </span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>重要字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>描叙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine</td>
+<td>Innodb、MyISAM</td>
+</tr>
+<tr>
+<td>Rows</td>
+<td>表中的行数。部分存储引擎，如 MyISAM，存储精确的数目。<br>对于其它存储引擎，比如 InnoDB，是一个大约的值，与实际值相差可达40到50％。在这些情况下，使用 SELECT COUNT(*) 来获得准确的数目。</td>
+</tr>
+<tr>
+<td>Avg_row_length</td>
+<td>平均每行包括的字节数</td>
+</tr>
+<tr>
+<td>Data_length</td>
+<td>对于 MyISAM，Data_length 是数据文件的长度（以字节为单位）。<br>对于 InnoDB，Data_length 是聚簇索引 clustered index 大约分配的内存量（以字节为单位）。</td>
+</tr>
+<tr>
+<td>Index_length</td>
+<td>对于 MyISAM，Index_length 是索引文件的长度（以字节为单位）。<br>对于 InnoDB，Index_length 是非聚簇索引 non-clustered index 大约分配的内存量（以字节为单位）。</td>
+</tr>
+<tr>
+<td>Auto_increment</td>
+<td>下一个Auto_increment的值</td>
+</tr>
+</tbody>
+</table>
+<h4 id="表结构查询"><a href="#表结构查询" class="headerlink" title="表结构查询"></a>表结构查询</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 查看列名（三者等价）</span><br><span class="line">$ show columns from table_name [from db_name];</span><br><span class="line">$ show columns from [db_name.]table_name;</span><br><span class="line">$ desc table_name;  // 简写形式</span><br></pre></td></tr></table></figure>
+<h4 id="表索引查询"><a href="#表索引查询" class="headerlink" title="表索引查询"></a>表索引查询</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ show index from table_name;</span><br></pre></td></tr></table></figure>
+<h4 id="建表语句"><a href="#建表语句" class="headerlink" title="建表语句"></a>建表语句</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ show create table table_name;</span><br></pre></td></tr></table></figure>
+<h3 id="用户权限"><a href="#用户权限" class="headerlink" title="用户权限"></a>用户权限</h3><h4 id="查询用户权限"><a href="#查询用户权限" class="headerlink" title="查询用户权限"></a>查询用户权限</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ show grants <span class="keyword">for</span> [username]@[adrress];</span><br></pre></td></tr></table></figure>
+<h4 id="创建用户授权"><a href="#创建用户授权" class="headerlink" title="创建用户授权"></a>创建用户授权</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 限制用户登陆ip，不限制使用<span class="string">'%'</span>代替，任意地方可连接</span><br><span class="line">$ grant [select,insert,update,delete]/[all privileges] on *.* to [username]@<span class="string">"[登陆ip]"</span> identified by <span class="string">"[password]"</span>;</span><br><span class="line"></span><br><span class="line">// 刷新权限</span><br><span class="line">$ flush privileges;</span><br></pre></td></tr></table></figure>
+<h3 id="查看系统相关"><a href="#查看系统相关" class="headerlink" title="查看系统相关"></a>查看系统相关</h3><h4 id="数据库状况检查"><a href="#数据库状况检查" class="headerlink" title="数据库状况检查"></a>数据库状况检查</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 该项参数有点多，官网查看</span><br><span class="line">$ show status</span><br></pre></td></tr></table></figure>
+<h4 id="数据库进程查询"><a href="#数据库进程查询" class="headerlink" title="数据库进程查询"></a>数据库进程查询</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ show processlist;</span><br><span class="line">$ show full processlist;</span><br><span class="line"></span><br><span class="line">+----+-----------------+-----------------+------+---------+---------+------------------------+------------------+</span><br><span class="line">| Id | User            | Host            | db   | Command | Time    | State                  | Info             |</span><br><span class="line">+----+-----------------+-----------------+------+---------+---------+------------------------+------------------+</span><br><span class="line">|  4 | event_scheduler | localhost       | NULL | Daemon  | 1389007 | Waiting on empty queue | NULL             |</span><br><span class="line">| 13 | root            | localhost:59450 | NULL | Sleep   |     551 |                        | NULL             |</span><br><span class="line">| 16 | root            | localhost       | NULL | Query   |       0 | starting               | show processlist |</span><br><span class="line">+----+-----------------+-----------------+------+---------+---------+------------------------+------------------+</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>描叙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Id</td>
+<td>进程Id   用途：kill id时可杀死进程</td>
+</tr>
+<tr>
+<td>User</td>
+<td>显示执行 SQL 的用户</td>
+</tr>
+<tr>
+<td>Host</td>
+<td>账号连接的Ip地址</td>
+</tr>
+<tr>
+<td>db</td>
+<td>显示这个进程目前连接的是哪个数据库</td>
+</tr>
+<tr>
+<td>Command</td>
+<td>显示当前连接的执行命令，一般就是守护进程（Daemon）休眠（ sleep ），查询（ query ），连接（ connect ）</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>这个状态持续的时间，单位是秒</td>
+</tr>
+<tr>
+<td>State</td>
+<td>显示使用当前连接的 SQL 语句的状态。</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>显示执行的 SQL 语句。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjp00cbsm00004k33iw8rc4ql" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2018/11/28/Mysql常用指令/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-dubbo群容错与负载均衡策略" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/11/18/dubbo群容错与负载均衡策略/" class="article-date">
@@ -153,7 +286,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjomqi38a000908332rqbu73c" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjp002wo400091f33s5qcf0iq" class="article-share-link">分享到</a>
       
 
       
@@ -262,7 +395,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjomqi37l00000833kzpu6ung" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjp002wnf00001f335ezxhjug" class="article-share-link">分享到</a>
       
 
       
@@ -411,7 +544,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjomqi37p00010833g34epupa" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjp002wnn00031f33zxh99613" class="article-share-link">分享到</a>
       
 
       
@@ -456,7 +589,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjomqi37u00030833a2gdg4ei" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjp002wnk00011f33xeqw26lo" class="article-share-link">分享到</a>
       
 
       
@@ -485,7 +618,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -494,7 +627,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -503,7 +636,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">4</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -513,6 +646,10 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/11/28/Mysql常用指令/">Mysql常用指令</a>
+          </li>
         
           <li>
             <a href="/2018/11/18/dubbo群容错与负载均衡策略/">Dubbo集群容错与负载均衡策略</a>
