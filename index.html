@@ -74,6 +74,110 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-MyISAM与InnoDB两者之间区别与选择，性能对比" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" class="article-date">
+  <time datetime="2019-02-16T07:05:23.000Z" itemprop="datePublished">2019-02-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="MyISAM引擎"><a href="#MyISAM引擎" class="headerlink" title="MyISAM引擎"></a>MyISAM引擎</h3><p>MyISAM是默认存储引擎（Mysql5.1前）。它基于更老的ISAM代码，但有很多有用的扩展。 在新版的mysql中，InnoDB引擎由于其对事务以及更高的并发性的支持，开始逐步的取代MyISAM引擎</p>
+<p>每个MyISAM在磁盘上存储成三个文件，每个文件的名字均以表的名字开始，扩展名指出文件类型，不同的拓展名指示其类型用途：</p>
+<ul>
+<li>.frm文件保存表的定义，这个文件并不是MyIsam引擎的一部分，而是服务器的一部份</li>
+<li>.myd保存表的数据 </li>
+<li>.myi是表的索引文件 </li>
+</ul>
+<p><strong>.myd和.myi是myisam的关键点</strong></p>
+<p>XXX.frm是表结构，XXX.MYD是存放数据的文件，XXX.MYI是存放索引的文件<br>索引文件存储关系key-value，value是存储一个指向XXX.MYD中数据行的指针。<br>在这里就可以看出myisam引擎的数据与索引是分开存储的。<br>当使用索引搜寻数据时，XXX.MYI文件中找出数据存储的位置指针，再到XXX.MYD中取出数据。</p>
+<h4 id="MyISAM引擎的特点"><a href="#MyISAM引擎的特点" class="headerlink" title="MyISAM引擎的特点"></a>MyISAM引擎的特点</h4><p><strong>myisam 表锁.牺牲了写性能,提高了读性能.</strong></p>
+<ol>
+<li>不支持事务</li>
+<li>表级锁，数据更新时会锁定整个表，并发性能低</li>
+<li>读写互斥</li>
+<li>缓存索引，不缓存数据：MyISAM可以通过Key_buffer_size缓存索引,以大大提高访问性能,减少磁盘IO,但是这个缓存区只会缓存索引,而不会缓存数据.</li>
+<li>读取速度快,占用资源相对少<blockquote>
+<pre><code>INNODB要缓存数据块，MYISAM只缓存索引块，这中间还有换进换出次数的减少
+innodb寻址要映射到块，再到行，MYISAM记录的直接是文件的OFFSET，定位比INNODB要快
+INNODB还需要维护MVCC一致
+</code></pre></blockquote>
+</li>
+<li>不支持外键约束,但是支持全文索引</li>
+</ol>
+<h4 id="Myisam引擎适用的生产业务场景"><a href="#Myisam引擎适用的生产业务场景" class="headerlink" title="Myisam引擎适用的生产业务场景"></a>Myisam引擎适用的生产业务场景</h4><ol>
+<li>对数据一致性要求不是非常高得业务、不需要事务支持的业务 </li>
+<li>一般为读数据比较多的应用，读写都频繁场景不适合，读多或者写多的都适合</li>
+<li>读写并发访问相对较低的业务</li>
+<li>数据修改相对较少的业务（阻塞问题）</li>
+<li>读写分离得mysql从库可以使用myisam </li>
+</ol>
+<p>对于使用Myisam引擎的表count性能会特别快</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain select count(id) from t1;</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+------------------------------+</span><br><span class="line">| id | select_type | table | type | possible_keys | key | key_len | ref | rows | Extra |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+------------------------------+</span><br><span class="line">| 1 | SIMPLE | NULL | NULL | NULL | NULL | NULL | NULL | NULL | Select tables optimized away |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+------------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>这里count(*)，count(1)，count(col)结果也是一样的。<br>从结果中我们看到 Extra列的值是：Select tables optimized away，表明这里使用了优化器了，原因是myisam引擎在insert、update、<br>delete使用统计器统计记录的变化，当使用count()无条件统计时，直接调用统计器</p>
+<h3 id="InnoDB引擎"><a href="#InnoDB引擎" class="headerlink" title="InnoDB引擎"></a>InnoDB引擎</h3><p>InnoDB是MYSQL的数据引擎之一，与传统的ISAM、MyISAM相比，InnoDB的最大特色就是支持了ACID兼容的事务功能，支持行级锁</p>
+<p>与MyISAM一样的是，InnoDB存储引擎也有.frm文件存储表结构的定义，但InnoDB有支持事务及安全的日志文件：</p>
+<p>这个文件非常重要，InnoDB可以通过日志文件将数据库崩溃时已经完成但还没来得及将内存中已经修改但未完全写入磁盘的数据写入磁盘，也可以把已部分完成并写入磁盘的未完成事务回滚，保证数据一致性。如果错误删除日志文件会导致数据库崩溃且无法启动。</p>
+<h4 id="InnoDB引擎特点"><a href="#InnoDB引擎特点" class="headerlink" title="InnoDB引擎特点"></a>InnoDB引擎特点</h4><ol>
+<li>DML操作遵循ACID模型，事务支持commit，rollback和crash recovery，从而保护用户数据</li>
+<li>行级锁定：基于行锁以及类似oracle的一致性读，提升了多用户的并发和性能</li>
+<li>具有非常高效的缓存特性：能缓存索引，也能缓存数据 </li>
+<li>支持MVCC（多版本并发控制）</li>
+<li>支持外键约束</li>
+</ol>
+<h4 id="InnoDB引擎适用的生产业务场景"><a href="#InnoDB引擎适用的生产业务场景" class="headerlink" title="InnoDB引擎适用的生产业务场景"></a>InnoDB引擎适用的生产业务场景</h4><ol>
+<li>需要事务支持的业务 </li>
+<li>行级锁定对高并发有很好的适应能力，但是要确保查询是通过索引完成的 </li>
+<li>数据读写及更新都较为频繁的场景 </li>
+<li>数据一致性要求较高的业务 </li>
+<li>硬件设备内存较大，可以利用InnoDB较好的缓存能力来提高内存利用率，尽可能较少磁盘IO </li>
+<li>相比Myisam引擎，innodb引擎更消耗资源，速度没有Myisam引擎快</li>
+</ol>
+<h4 id="Innodb引擎调优精要"><a href="#Innodb引擎调优精要" class="headerlink" title="Innodb引擎调优精要"></a>Innodb引擎调优精要</h4><ol>
+<li>主键尽可能小，比秒给Secondary index带来过大的空间负担 </li>
+<li>建立有效索引比全表扫描，因为会使用表锁 </li>
+<li>尽可能缓存所有的索引和数据，提高响应速度，减少磁盘IO消耗 </li>
+<li>在大批量小插入的时候，尽量自己控制事务而不要使用autocommit自动提交， </li>
+<li>合理设置innodb_flush_log_at_trx_commit参数值，不要过度追求安全性 </li>
+<li>避免主键更新，因为这会带来大量的数据移动</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjs754etd0005mn3306t773vd" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-Java-Map集合" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/13/Java-Map集合/" class="article-date">
@@ -144,7 +248,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjpovz5at000fmr337xunh3tl" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjs754eto000imn336xrj95px" class="article-share-link">分享到</a>
       
 
       
@@ -213,7 +317,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjpovz5ae0004mr33kfog174m" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjs754etc0004mn33zyyardsn" class="article-share-link">分享到</a>
       
 
       
@@ -346,7 +450,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjpovz5ah0005mr33ovpe3e6f" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjs754etf0008mn336h4e6a8e" class="article-share-link">分享到</a>
       
 
       
@@ -443,7 +547,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjpovz5au000gmr33xo6eyoah" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjs754etp000jmn33dmxbwtfg" class="article-share-link">分享到</a>
       
 
       
@@ -552,7 +656,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjpovz5a40000mr33f92ox9hn" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjs754et40000mn3368qnsujf" class="article-share-link">分享到</a>
       
 
       
@@ -701,7 +805,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjpovz5a70001mr335nlv6z5w" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjs754et80001mn33a29gyehp" class="article-share-link">分享到</a>
       
 
       
@@ -746,7 +850,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjpovz5ac0003mr337x3egijt" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjs754etb0003mn33z3uqd51t" class="article-share-link">分享到</a>
       
 
       
@@ -775,7 +879,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -784,7 +888,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -793,7 +897,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -803,6 +907,10 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
+          </li>
         
           <li>
             <a href="/2018/12/13/Java-Map集合/">Java HashMap</a>
@@ -818,10 +926,6 @@
         
           <li>
             <a href="/2018/11/18/dubbo群容错与负载均衡策略/">Dubbo集群容错与负载均衡策略</a>
-          </li>
-        
-          <li>
-            <a href="/2018/11/17/Dockerfile配置用法/">Dockerfile配置用法</a>
           </li>
         
       </ul>
@@ -855,7 +959,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 °．·°∴Lín。<br>
+      &copy; 2019 °．·°∴Lín。<br>
       坐亦禅，行亦禅，一花一世界，一叶一如来，春来花自青，秋至叶飘零，无穷般若心自在，语默动静体自然。
     </div>
   </div>
