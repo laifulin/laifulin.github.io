@@ -74,6 +74,162 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-MySQL-ACID-事务模型与隔离级别" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/19/MySQL-ACID-事务模型与隔离级别/" class="article-date">
+  <time datetime="2019-02-19T14:40:26.000Z" itemprop="datePublished">2019-02-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/19/MySQL-ACID-事务模型与隔离级别/">MySQL ACID 事务模型与隔离级别</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="ACID模型"><a href="#ACID模型" class="headerlink" title="ACID模型"></a>ACID模型</h2><p>基维百科关于ACID的定义：</p>
+<blockquote>
+<p> ACID 是数据库事务的一组属性，旨在即使在发生错误、电源故障等情况下也能保证数据有效性。在数据库环境中，一系列满足 ACID 属性的数据库操作（可以视作对数据的单个逻辑操作）称为事务。例如，将资金从某个银行账户转账到另一个银行账户。</p>
+</blockquote>
+<h3 id="原子性（Atomicity）"><a href="#原子性（Atomicity）" class="headerlink" title="原子性（Atomicity）"></a>原子性（Atomicity）</h3><blockquote>
+<p> 指一个操作是不可中断的，要么全部执行成功要么全部执行失败，有着“同生共死”的感觉</p>
+</blockquote>
+<p>相关的 MySQL 功能包括：</p>
+<ul>
+<li>事务的自动提交（autocommit）设置  – select @@autocommit;。</li>
+<li>START TRANSACTION、COMMIT、ROLLBACK 语句。</li>
+</ul>
+<h3 id="一致性（Consistency）"><a href="#一致性（Consistency）" class="headerlink" title="一致性（Consistency）"></a>一致性（Consistency）</h3><blockquote>
+<p> 指事务执行的结果必须是使数据库从一个一致性状态变到另一个一致性状态</p>
+</blockquote>
+<p>相关的 MySQL 功能包括：</p>
+<ul>
+<li>InnoDB 双写缓冲区。</li>
+<li>InnoDB 崩溃恢复。</li>
+</ul>
+<h3 id="隔离性（Isolation）"><a href="#隔离性（Isolation）" class="headerlink" title="隔离性（Isolation）"></a>隔离性（Isolation）</h3><blockquote>
+<p> 一个事务所做的修改在最终提交以前，对其他事务是不可见的,可以防止多个事务并发执行时由于交叉执行而导致的数据不一致问题</p>
+</blockquote>
+<p>相关的 MySQL 功能包括：</p>
+<ul>
+<li>事务的自动提交（autocommit）设置。</li>
+<li>SET TRANSACTION ISOLATION LEVEL 语句。</li>
+</ul>
+<h3 id="持久性（Durability）"><a href="#持久性（Durability）" class="headerlink" title="持久性（Durability）"></a>持久性（Durability）</h3><blockquote>
+<p> 一旦事务提交，则其所做的修改会永久保存到数据库中。此时即使系统崩溃、修改的数据也不会丢失。</p>
+</blockquote>
+<p>持久性是个有点模糊的概念，因为实际上持久性也分很多不同的级别。有些持久性策略能够提供非常强的安全保障，而有些则未必，而且不可能有能做到100%的持久性保证的策略。</p>
+<h2 id="读现象问题"><a href="#读现象问题" class="headerlink" title="读现象问题"></a>读现象问题</h2><p>众所周知，Innodb最大的特点是：支持事务、支持行级锁。既然支持事务，那么就会有处理并发事务带来的问题：脏读、不可重复读、幻读</p>
+<p>每种关系型数据库都提供了各自特色的隔离级别实现，虽然在通常的隔离级别定义中是以锁为实现单元，但实际的实现千差万别。以最常见的 MySQL InnoDB 存储引擎为例，它是基于 MVCC（Multi-Versioning Concurrency Control）和锁的复合实现，按照隔离程度从低到高，MySQL InnoDB 存储引擎的事务隔离级别及其解决问题如下：</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>select默认模式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>读未提交</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+<td></td>
+</tr>
+<tr>
+<td>读已提交</td>
+<td>×</td>
+<td>√</td>
+<td>√</td>
+<td>一致性非加锁读，总使用最新快照（Consistent Non-locking Reads (MVCC)）</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>×</td>
+<td>×</td>
+<td>×（InnoDB特有）<br>gap lock 或 next-key lock</td>
+<td>一致性非加锁读，总是使用首次快照（Consistent Non-locking Reads (MVCC)）</td>
+</tr>
+<tr>
+<td>串行化</td>
+<td>×</td>
+<td>×</td>
+<td>×<br>gap lock 或 next-key lock</td>
+<td>加共享锁读（S-Locking reads）</td>
+</tr>
+</tbody>
+</table>
+<p><strong><em>注：REPEATBLE</em> READ 级别并不能完全避免幻读，需要加next key locks</strong></p>
+<h3 id="脏读（Dirty-reads）"><a href="#脏读（Dirty-reads）" class="headerlink" title="脏读（Dirty reads）"></a>脏读（Dirty reads）</h3><p>一个事务能够看到其他事务尚未提交的修改。例如：</p>
+<p><img src="/2019/02/19/MySQL-ACID-事务模型与隔离级别/dirty_read.png" alt="image"></p>
+<h3 id="不可重复读（Non-repeatable-reads）"><a href="#不可重复读（Non-repeatable-reads）" class="headerlink" title="不可重复读（Non-repeatable reads）"></a>不可重复读（Non-repeatable reads）</h3><p>一个事务两次执行相同的查询语句，返回不同的==结果==（关注点在update/delete）。例如：</p>
+<p><img src="/2019/02/19/MySQL-ACID-事务模型与隔离级别/non_repeatable_read.png" alt="image"></p>
+<p>有两种策略可以避免不可重复读：</p>
+<ul>
+<li>采用共享锁（s-lock）或者排他锁（x-lock），进行加锁读操作（Locking reads）</li>
+<li>采用多版本并发控制（MVCC），进行一致性非加锁读（Consistent Non-locking Reads）</li>
+</ul>
+<h3 id="幻读（Phantom-reads）"><a href="#幻读（Phantom-reads）" class="headerlink" title="幻读（Phantom reads）"></a>幻读（Phantom reads）</h3><p>一个事务两次执行相同的查询语句，返回不同的==结果集==（关注点在insert）。例如：</p>
+<p><img src="/2019/02/19/MySQL-ACID-事务模型与隔离级别/phantom_read.png" alt="image"></p>
+<h2 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h2><p>事务的隔离级别就是为了解决上面集中问题产生的，通过提升事务的隔离级别（Isolation Level），可以逐一解决上述问题。所谓隔离级别，就是在数据库事务中，为保证多个事务并发数据读写的正确性而提出的定义，它并不是 MySQL 专有的概念，而是源于 ANSI/ISO 制定的 SQL-92 标准。</p>
+<h3 id="读未提交"><a href="#读未提交" class="headerlink" title="读未提交"></a>读未提交</h3><p>一个事务可以看到其他事务未提交的修改，这是最低的隔离级别，所以很明显这个级别的隔离机制无法解决脏读、不可重复读、幻读中的任何一种</p>
+<p>这个级别会导致很多问题，从性能上来说，也不会比其它级别好太多，但却缺乏其它级别的很多好处，实际应用中很少使用。</p>
+<h3 id="读已提交"><a href="#读已提交" class="headerlink" title="读已提交"></a>读已提交</h3><p>事务能够看到其他事务已提交的修改，也就是保证不会看到任何中间状态，因此不会出现脏读问题。但是，读已提交仍是比较低的隔离级别，并不能保证再次读取时是否能获取同样的数据，也就是允许其他事务并发修改数据，不能解决不可重复读与幻读的情况。</p>
+<ul>
+<li>同一事务中的一致性读取总会设置和读取自己的<strong><em>最新快照</em></strong>，因此会产生不可重复读的问题，因为其他事务可能会并发修改数据</li>
+<li>对于加锁、update、delete语句，InnoDB仅锁定匹配的索引记录。由于禁用了gap lock，因此会产生幻读，因为其他事务可能会并发insert数据</li>
+</ul>
+<h3 id="可重复度"><a href="#可重复度" class="headerlink" title="可重复度"></a>可重复度</h3><p>这是MySQL InnoDB存储引擎默认的隔离级别。</p>
+<ul>
+<li>同一事务中的一致性读取（Consistent read）总是会读取<strong><em>第一次读取时建立的快照</em></strong>（snapshot）。这意味着如果你在同一事务中发起多个普通（非锁定） SELECT 语句，其查询结果是相互一致的。一致性读取机制保证了同一事务中多次读取的数据是一致的，避免了不可重复读问题，不管其它事务是否提交了 INSERT、DELETE、UPDATE 操作。如果想每次 SELECT 都返回最新快照，要么隔离级别降为 READ COMMITTED，要么使用加锁读。</li>
+<li><p>对于加锁读、UPDATE、DELETE 语句，加锁行为取决于语句是使用具有唯一搜索条件的唯一索引还是范围类型的搜索条件：</p>
+<ul>
+<li><p>对于具有唯一搜索条件的唯一索引， InnoDB 仅锁定匹配的索引记录。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事务 T1 的 x-lock 会阻止其它事务加锁读或修改 id = 10 的记录</span><br><span class="line">SELECT * FROM parent WHERE id = 10 FOR UPDATE;</span><br><span class="line">事务 T2 无法修改 id = 10 的记录，直到事务 T1 结束</span><br><span class="line">UPDATE parent SET name = <span class="string">'Pete'</span> WHERE id = 10;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>- 对于其它搜索条件，InnoDB 使用 gap lock 或 next-key lock 锁定扫描到的索引范围， 以阻止其它会话插入被范围所覆盖的间隙。这是 InnoDB 和其它一些数据库实现的不同，解决了可重复读级别下的幻读问题。例如：
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">事务 T1 的 gap lock 会阻止其它事务插入 id &gt; 10 的记录</span><br><span class="line">SELECT * FROM parent WHERE id &gt; 10 FOR UPDATE;</span><br><span class="line">事务 T2 无法插入 id &gt; 10 的新记录，直到事务 T1 结束</span><br><span class="line">INSERT INTO parent(id, name) VALUES(11, <span class="string">'Pete'</span>);</span><br><span class="line">事务 T2 可以插入 id &lt;= 9 的新记录，无需等待事务 T1</span><br><span class="line">INSERT INTO parent(id, name) VALUES(9, <span class="string">'Pete'</span>);</span><br></pre></td></tr></table></figure>
+</code></pre><h3 id="串行化"><a href="#串行化" class="headerlink" title="串行化"></a>串行化</h3><p>并发事务之间是串行化的，通常意味着读取需要获取共享读锁，更新需要获取排他写锁，如果 SQL 使用 WHERE 语句，还会获取 gap lock 和 next-key lock，可能导致大量的超时和锁争用的问题。</p>
+<p>这是最高的隔离级别，实际应用中很少使用，只有在非常需要确保数据一致性而且可以接受没有并发的情况下，才会考虑。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/" data-id="cjsbwpaxl0005bz33d9sgj0nt" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-MyISAM与InnoDB两者之间区别与选择，性能对比" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" class="article-date">
@@ -160,7 +316,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjs754etd0005mn3306t773vd" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjsbwpaxk0004bz33hhodr98s" class="article-share-link">分享到</a>
       
 
       
@@ -248,7 +404,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjs754eto000imn336xrj95px" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjsbwpaxz000kbz33ccfyjqq8" class="article-share-link">分享到</a>
       
 
       
@@ -317,7 +473,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjs754etc0004mn33zyyardsn" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjsbwpaxj0003bz330wgdcqx7" class="article-share-link">分享到</a>
       
 
       
@@ -450,7 +606,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjs754etf0008mn336h4e6a8e" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjsbwpaxn0008bz330pfto0dv" class="article-share-link">分享到</a>
       
 
       
@@ -547,7 +703,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjs754etp000jmn33dmxbwtfg" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjsbwpay0000lbz33qpf7njmn" class="article-share-link">分享到</a>
       
 
       
@@ -656,7 +812,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjs754et40000mn3368qnsujf" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjsbwpaxo0009bz33dn40mpqv" class="article-share-link">分享到</a>
       
 
       
@@ -805,7 +961,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjs754et80001mn33a29gyehp" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjsbwpax70000bz33beespg9n" class="article-share-link">分享到</a>
       
 
       
@@ -850,7 +1006,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjs754etb0003mn33z3uqd51t" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjsbwpaxe0001bz33spjzyj7z" class="article-share-link">分享到</a>
       
 
       
@@ -879,7 +1035,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -888,7 +1044,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -897,7 +1053,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -907,6 +1063,10 @@ INNODB还需要维护MVCC一致
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/02/19/MySQL-ACID-事务模型与隔离级别/">MySQL ACID 事务模型与隔离级别</a>
+          </li>
         
           <li>
             <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
@@ -922,10 +1082,6 @@ INNODB还需要维护MVCC一致
         
           <li>
             <a href="/2018/11/28/Mysql常用指令/">Mysql常用指令</a>
-          </li>
-        
-          <li>
-            <a href="/2018/11/18/dubbo群容错与负载均衡策略/">Dubbo集群容错与负载均衡策略</a>
           </li>
         
       </ul>
