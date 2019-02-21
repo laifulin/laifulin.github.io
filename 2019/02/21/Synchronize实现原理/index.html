@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Synchronize实现原理 | °．·°∴Lín。</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="123456789101112131415161718192021222324public class SynchronizedDemo implements Runnable &amp;#123;    private static int count = 0;    public static void main(String[] args) &amp;#123;        for (int i = 0;">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Synchronize实现原理">
+<meta property="og:url" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/index.html">
+<meta property="og:site_name" content="°．·°∴Lín。">
+<meta property="og:description" content="123456789101112131415161718192021222324public class SynchronizedDemo implements Runnable &amp;#123;    private static int count = 0;    public static void main(String[] args) &amp;#123;        for (int i = 0;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/monitor.png">
+<meta property="og:image" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/java_head.png">
+<meta property="og:image" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/biased_lock.png">
+<meta property="og:image" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/lightweight_lock.png">
+<meta property="og:updated_time" content="2019-02-21T14:42:39.531Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Synchronize实现原理">
+<meta name="twitter:description" content="123456789101112131415161718192021222324public class SynchronizedDemo implements Runnable &amp;#123;    private static int count = 0;    public static void main(String[] args) &amp;#123;        for (int i = 0;">
+<meta name="twitter:image" content="http://laifulin.github.io/2019/02/21/Synchronize实现原理/monitor.png">
+  
+    <link rel="alternative" href="/atom.xml" title="°．·°∴Lín。" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head></html>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">°．·°∴Lín。</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">laifulin</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name="tn" type="hidden" value="bds">
+          <input name="cl" type="hidden" value="3">
+          <input name="ct" type="hidden" value="2097152">
+          <input type="hidden" name="si" value="laifulin.github.io">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Synchronize实现原理" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/21/Synchronize实现原理/" class="article-date">
+  <time datetime="2019-02-21T14:38:53.000Z" itemprop="datePublished">2019-02-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Synchronize实现原理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><br><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class SynchronizedDemo implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">    private static int count = 0;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            Thread thread = new Thread(new SynchronizedDemo());</span><br><span class="line">            thread.start();</span><br><span class="line">        &#125;</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep(500);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;result: &quot; + count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10000; i++) &#123;</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>开10个线程，每个线程对count累加10000次。如果结果正确的话自然而然总数就应该是10 * 10000 = 100000。可就运行多次结果都不是这个数，而且每次运行结果都不一样。这是为什么了？有什么解决方案了？</p>
+<p>出现这种线程问题主要源于JMM的设计，主要问题集中在主内存和线程的工作内存的内存可见性问题以及重排序问题。线程运行时拥有自己的栈空间，会在自己的栈空间运行，如果多线程间没有共享的数据也就是说多线程间并没有协作完成一件事情，那么，多线程就不能发挥优势，不能带来巨大的价值。那么共享数据的线程安全问题怎样处理？很自然而然的想法就是每一个线程依次去读写这个共享变量，这样就不会有任何数据安全的问题，因为每个线程所操作的都是当前最新的版本数据。在java关键字synchronized就具有使每个线程依次排队操作共享变量的功能。</p>
+<h3 id="Synchronized的使用场景"><a href="#Synchronized的使用场景" class="headerlink" title="Synchronized的使用场景"></a>Synchronized的使用场景</h3><p>在java代码中使用synchronized可是使用在代码块和方法中，根据Synchronized用的位置可以有这些使用场景:</p>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>具体分类</th>
+<th>被锁对象</th>
+<th>伪代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>方法</td>
+<td>实例方法</td>
+<td>类的实例对象</td>
+<td>public synchronized void addCount(){<br>count++;<br>}</td>
+</tr>
+<tr>
+<td>方法</td>
+<td>静态方法</td>
+<td>类对象</td>
+<td>public static synchronized void addCount(){<br>count++;<br>}</td>
+</tr>
+<tr>
+<td>代码块</td>
+<td>实例对象</td>
+<td>类的实例对象</td>
+<td>synchronized(this){<br>count++;<br>}</td>
+</tr>
+<tr>
+<td>代码块</td>
+<td>class对象</td>
+<td>类对象</td>
+<td>synchronized(SynchronizedDemo.class){<br>count++;<br>}</td>
+</tr>
+<tr>
+<td>代码块</td>
+<td>任意实例对象Object</td>
+<td>实例对象Object</td>
+<td>类似于实例对象</td>
+</tr>
+</tbody>
+</table>
+<p>因此上面问题解决方法为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">   public void run() &#123;</span><br><span class="line">       for (int i = 0; i &lt; 10000; i++) &#123;</span><br><span class="line">           addCount();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public static synchronized void addCount()&#123;</span><br><span class="line">       /*synchronized(SynchronizedDemo.class)&#123;</span><br><span class="line">           count++;</span><br><span class="line">       &#125;*/</span><br><span class="line">       count++;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Synchronized底层实现"><a href="#Synchronized底层实现" class="headerlink" title="Synchronized底层实现"></a>Synchronized底层实现</h3><p>使用javap -v SynchronizedDemo.class命令查看字节码文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">  // addCount方法使用同步代码块实现</span><br><span class="line">  public static void addCount()&#123;</span><br><span class="line">        synchronized(SynchronizedDemo.class)&#123;</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">  // 字节码</span><br><span class="line">  public void addCount();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=3, args_size=1</span><br><span class="line">         0: ldc           #3                  // class com/lin/test/sync/Synchro</span><br><span class="line">nizedDemo</span><br><span class="line">         2: dup</span><br><span class="line">         3: astore_1</span><br><span class="line">         4: monitorenter                      // 执行进入同步方法指令</span><br><span class="line">         5: getstatic     #17                 // Field count:I</span><br><span class="line">         8: iconst_1</span><br><span class="line">         9: iadd</span><br><span class="line">        10: putstatic     #17                 // Field count:I</span><br><span class="line">        13: aload_1</span><br><span class="line">        14: monitorexit                       //执行退出同步方法指令</span><br><span class="line">        15: goto          23</span><br><span class="line">        18: astore_2</span><br><span class="line">        19: aload_1</span><br><span class="line">        20: monitorexit                       //执行退出同步方法指令</span><br><span class="line">        21: aload_2</span><br><span class="line">        22: athrow</span><br><span class="line">        23: return</span><br></pre></td></tr></table></figure>
+<p>从字节码中可知<strong>同步语句块</strong>的实现使用的是monitorenter 和 monitorexit 指令，这也是添Synchronized关键字之后独有的。执行同步代码块后首先要先执行monitorenter指令，退出的时候monitorexit指令。通过分析之后可以看出，使用Synchronized进行同步，其关键就是必须要对对象的监视器monitor进行获取，当线程获取monitor后才能继续往下执行，否则就只能等待。而这个获取的过程是互斥的，即同一时刻只有一个线程能够获取到monitor。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> // addCount方法使用方法级同步实现</span><br><span class="line"> public static synchronized void addCount()&#123;</span><br><span class="line">        count++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">  public static synchronized void addCount();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC, ACC_SYNCHRONIZED</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=0, args_size=0</span><br><span class="line">         0: getstatic     #17                 // Field count:I</span><br><span class="line">         3: iconst_1</span><br><span class="line">         4: iadd</span><br><span class="line">         5: putstatic     #17                 // Field count:I</span><br><span class="line">         8: return</span><br></pre></td></tr></table></figure>
+<p>方法级同步是隐式，即无需通过字节码命令来控制，它的实现是在方法的调用和返回操作中。VM可以从方法常量池中的方法表结构(method_info_Structure)中的ACC_SYNCHRONIZED访问标志区分一个方法是否同步方法。当方法调用时，调用指令将会 检查方法的ACC_SYNCHRONIZED访问标志是否被设置，如果设置了，执行线程将先持有monitor， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。</p>
+<h4 id="Monitor"><a href="#Monitor" class="headerlink" title="Monitor"></a>Monitor</h4><blockquote>
+<p> Monitor可以理解为一种同步工具，也可以理解为一种同步机制，常常被描叙为一个Java对象。</p>
+</blockquote>
+<ul>
+<li>互斥：同一个时刻，只有一个 进程/线程 能进入 monitor 中定义的临界区，这使得 monitor 能够达到互斥的效果</li>
+<li>signal机制：如果条件变量不满足，允许一个正在持有Monitor的线程暂时释放持有权，当条件变量满足时，当前线程可以唤醒正在等待该条件变量的线程，然后重新获取Monitor的持有权</li>
+</ul>
+<p>下图表现了对象，对象监视器，同步队列以及执行线程状态之间的关系：</p>
+<p><img src="/2019/02/21/Synchronize实现原理/monitor.png" alt="image"></p>
+<p>该图可以看出，任意线程对Object的访问，首先要获得Object的监视器，如果获取失败，该线程就进入同步状态，线程状态变为BLOCKED，当Object的监视器占有者释放后，在同步队列中得线程就会有机会重新获取该监视器</p>
+<blockquote>
+<p> 由此可以看出：<strong><em>monitor</em> 机制的目的主要是为了互斥进入临界区</strong></p>
+</blockquote>
+<p>Monitor的本质是依赖底层操作系统的MutexLock实现的，操作系统实现线程之间的切换需要从用户态到内核态的转换，成本非常高。</p>
+<h3 id="Synchronized优化"><a href="#Synchronized优化" class="headerlink" title="Synchronized优化"></a>Synchronized优化</h3><p>从上面我们可以得知synchronized最大的特征在同一时刻只有一个线程可以持有对象的监视器（monitor），从而进入到同步代码块或者同步方法中，即表现为互斥性（排他性）。这种方式肯定效率低下，每次只能通过一个线程，既然每次只能通过一个，这种形式不能改变的话，那么我们能不能让每次通过的速度变快一点了</p>
+<h4 id="CAS-比较并交换（compare-and-swap）"><a href="#CAS-比较并交换（compare-and-swap）" class="headerlink" title="CAS 比较并交换（compare and swap）"></a>CAS 比较并交换（compare and swap）</h4><p>使用锁时，线程获取锁是一种悲观锁策略,在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。而CAS操作（又称为无锁操作）是一种乐观锁策略，它假设所有线程访问共享资源的时候不会出现冲突，既然不会出现冲突自然而然就不会阻塞其他线程的操作。因此，线程就不会出现阻塞停顿的状态。那么，如果出现冲突了怎么办？无锁操作是使用CAS(compare and swap)又叫做比较交换来鉴别线程是否出现冲突，出现冲突就重试当前操作直到没有冲突为止。</p>
+<blockquote>
+<pre><code>**CAS操作避免了多线程的竞争锁，上下文切换和进程调度**
+</code></pre></blockquote>
+<blockquote>
+<p> CAS操作包含三个操作数 —— 内存位置（V）、预期原值（A）和新值(B)。 如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值 。否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该位置的值。</p>
+</blockquote>
+<p>类似于下面代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public void compareAndSwap(int v,int a,int b) &#123;</span><br><span class="line">        if (v == a) &#123;</span><br><span class="line">            v = b;</span><br><span class="line">        &#125;else &#123;</span><br><span class="line">            // 什么也不做</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>CAS会导致的问题：</p>
+<ul>
+<li>ABA问题</li>
+</ul>
+<blockquote>
+<p> 因为CAS会检查旧值有没有变化，这里存在这样一个有意思的问题。比如一个旧值A变为了成B，然后再变成A，刚好在做CAS时检查发现旧值并没有变化依然为A，但是实际上的确发生了变化。解决方案可以沿袭数据库中常用的乐观锁方式，添加一个版本号可以解决。原来的变化路径A-&gt;B-&gt;A就变成了1A-&gt;2B-&gt;3C。</p>
+</blockquote>
+<ul>
+<li>自旋时间过长</li>
+</ul>
+<blockquote>
+<p> 使用CAS非阻塞同步，也就是说不会将线程挂起，会自旋（不停的循环）进入下一次尝试，如果这里自旋时间过长对性能是很大的消耗。如果JVM能支持处理器提供的pause指令，那么在效率上会有一定的提升</p>
+</blockquote>
+<ul>
+<li>只能保证一个共享变量的原子操作</li>
+</ul>
+<blockquote>
+<p> 当对一个共享变量执行操作时CAS能保证其原子性，如果对多个共享变量进行操作,CAS就不能保证其原子性。有一个解决方案是利用对象整合多个共享变量，即一个类中的成员变量就是这几个共享变量。然后将这个对象做CAS操作就可以保证其原子性。atomic中提供了AtomicReference来保证引用对象之间的原子性。</p>
+</blockquote>
+<h4 id="JAVA对象头"><a href="#JAVA对象头" class="headerlink" title="JAVA对象头"></a>JAVA对象头</h4><p><img src="/2019/02/21/Synchronize实现原理/java_head.png" alt="image"></p>
+<blockquote>
+<pre><code>对象的状态一共有五种，分别是无锁态、轻量级锁、重量级锁、GC标记和偏向锁.
+</code></pre></blockquote>
+<blockquote>
+<p> 在32位的HotSpot虚拟机 中对象未被锁定的状态下，Mark Word的32个Bits空间中的25Bits用于存储对象哈希码(HashCode)，4Bits用于存储对象分代年龄，2Bits用于存储锁标志位，1Bit固定为0，表示非偏向锁。</p>
+</blockquote>
+<h4 id="锁状态"><a href="#锁状态" class="headerlink" title="锁状态"></a>锁状态</h4><blockquote>
+<pre><code>锁一共有4种状态，级别从低到高依次是：无锁状态、偏向锁状态、轻量级锁状态和重量级锁状态。
+</code></pre></blockquote>
+<h5 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h5><p>锁的获取：</p>
+<blockquote>
+<p> 当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程ID，以后该线程在进入和退出同步块时不需要进行CAS操作来加锁和解锁，只需简单地测试一下对象头的Mark Word里是否存储着指向当前线程的偏向锁。如果测试成功，表示线程已经获得了锁。如果测试失败，则需要再测试一下Mark Word中偏向锁的标识是否设置成1（表示当前是偏向锁）：如果没有设置，则使用CAS竞争锁；如果设置了，则尝试使用CAS将对象头的偏向锁指向当前线程。</p>
+</blockquote>
+<p>锁的撤销：</p>
+<blockquote>
+<p> 偏向锁使用了一种等到竞争出现才释放锁的机制，所以当其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁。偏向锁的撤销，需要等待全局安全点（在这个时间点上没有正在执行的字节码 – 会出现stop the world 时间会很短）</p>
+</blockquote>
+<p>线程1展示了偏向锁获取的过程，线程2展示了偏向锁撤销的过程:</p>
+<p><img src="/2019/02/21/Synchronize实现原理/biased_lock.png" alt="image"></p>
+<p>缺点：</p>
+<ul>
+<li>单核处理器上，不存在实际的并行，当前线程不阻塞自己的话，旧owner就不能执行，锁永远不会释放，此时不管自旋多久都是浪费；进而，如果线程多而处理器少，自旋也会造成不少无谓的浪费</li>
+<li>自旋锁要占用CPU，如果是计算密集型任务，这一优化通常得不偿失，减少锁的使用是更好的选择</li>
+<li>如果锁竞争的时间比较长，那么自旋通常不能获得锁，白白浪费了自旋占用的CPU时间。这通常发生在锁持有时间长，且竞争激烈的场景中，此时应主动禁用自旋锁。</li>
+</ul>
+<blockquote>
+<p> 如果你确定应用程序里所有的锁通常情况下处于竞争状态，可以通过JVM参数关闭偏向锁：<strong>-XX:-UseBiasedLocking=false</strong>，那么程序默认会进入轻量级锁状态<br>使用-XX:-UseSpinning参数关闭自旋锁优化；-XX:PreBlockSpin参数修改默认的自旋次数。</p>
+</blockquote>
+<h5 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h5><p>加锁：</p>
+<blockquote>
+<p> 线程在执行同步块之前，JVM会先在当前线程的栈桢中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，官方称为Displaced Mark Word。然后线程尝试使用CAS将对象头中的Mark Word替换为指向锁记录的指针。如果成功，当前线程获得锁，如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁</p>
+</blockquote>
+<p>解锁：</p>
+<blockquote>
+<p> 轻量级解锁时，会使用原子的CAS操作将Displaced Mark Word替换回到对象头，如果成功，则表示没有竞争发生。如果失败，表示当前锁存在竞争，锁就会膨胀成重量级锁。</p>
+</blockquote>
+<p>下图是两个线程同时争夺锁，导致锁膨胀的流程图：</p>
+<p><img src="/2019/02/21/Synchronize实现原理/lightweight_lock.png" alt="image"></p>
+<h5 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h5><p>内置锁在Java中被抽象为监视器锁（monitor）。在JDK 1.6之前，监视器锁可以认为直接对应底层操作系统中的互斥量（mutex）。这种同步方式的成本非常高，包括系统调用引起的内核态与用户态切换、线程阻塞造成的线程切换等。因此，后来称这种锁为“重量级锁”。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/" data-id="cjseqlk2i000opj33nzl5p5qr" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2019/02/21/Synchronize实现原理/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/02/19/MySQL-ACID-事务模型与隔离级别/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">MySQL ACID 事务模型与隔离级别</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2019/02/21/Synchronize实现原理/" data-title="Synchronize实现原理" data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/"></div>
+  </section>
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/02/21/Synchronize实现原理/">Synchronize实现原理</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/19/MySQL-ACID-事务模型与隔离级别/">MySQL ACID 事务模型与隔离级别</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/13/Java-Map集合/">Java HashMap</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/05/JVM性能调优与常用监控工具/">JVM性能调优与常用监控工具</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="https://github.com/laifulin" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="326620938" target="_blank">QQ</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 °．·°∴Lín。<br>
+      坐亦禅，行亦禅，一花一世界，一叶一如来，春来花自青，秋至叶飘零，无穷般若心自在，语默动静体自然。
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"></a>
+</div>
+
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"°．·°∴Lín。"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
+
+
+<!-- 百度分享 start -->
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+</div>
+</body>
+</html>
