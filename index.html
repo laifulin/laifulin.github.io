@@ -74,6 +74,95 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-JAVA并发之线程中断" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/03/17/JAVA并发之线程中断/" class="article-date">
+  <time datetime="2019-03-17T08:43:02.000Z" itemprop="datePublished">2019-03-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/17/JAVA并发之线程中断/">JAVA并发之线程中断</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p> 在Java中停止一个线程的主要机制是中断，中断并不是强迫终止一个线程，它是一种协作机制，给线程传递一个终止信号，但是由线程自身来决定如何及何时退出。</p>
+</blockquote>
+<h3 id="java中对线程中断所提供的API支持"><a href="#java中对线程中断所提供的API支持" class="headerlink" title="java中对线程中断所提供的API支持"></a>java中对线程中断所提供的API支持</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public boolean isInterrupted();//测试此线程是否已被中断。此方法不影响线程的中断状态</span><br><span class="line">public void interrupt();//中断线程</span><br><span class="line">public static boolean interrupted();//测试此线程是否已被中断，并清空中断标志位</span><br><span class="line"></span><br><span class="line">public class InterruptTest &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 简易代码</span><br><span class="line">     * @param args</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;当前线程状态--1&quot;+Thread.currentThread().isInterrupted());</span><br><span class="line">        Thread.currentThread().interrupt();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;当前线程状态--2&quot;+Thread.currentThread().isInterrupted());</span><br><span class="line">        System.out.println(&quot;当前线程状态--3&quot;+Thread.interrupted());</span><br><span class="line">        System.out.println(&quot;当前线程状态--4&quot;+Thread.interrupted());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">* 打印结果如下</span><br><span class="line">**/</span><br><span class="line">当前线程状态1--false</span><br><span class="line">当前线程状态2--true</span><br><span class="line">当前线程状态3--true</span><br><span class="line">当前线程状态4--false</span><br></pre></td></tr></table></figure>
+<p>但是调用线程的interrupt方法只是给线程传递一个终止标识，线程的何时终止怎么终止需要由线程自身决定。</p>
+<p>但问题是，当线程收到一个终止标识后该如何去终止线程呢？</p>
+<ol>
+<li>可以直接采用return语句结束当前方法</li>
+<li>另一种更优雅的方式则是：抛出InterruptedException异常</li>
+</ol>
+<h3 id="线程在不同状态下对于中断所产生的反应"><a href="#线程在不同状态下对于中断所产生的反应" class="headerlink" title="线程在不同状态下对于中断所产生的反应"></a>线程在不同状态下对于中断所产生的反应</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">public enum State &#123;</span><br><span class="line">        /**</span><br><span class="line">         * 尚未启动的线程的线程状态，即未执行start方法的线程</span><br><span class="line">         */</span><br><span class="line">        NEW,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 可运行线程的线程状态。 处于可运行状态的线程正在Java虚拟机中执行，但它可能正在等待来自操作系统的其他资源，例如处理器。</span><br><span class="line">         */</span><br><span class="line">        RUNNABLE,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 线程在等待锁，试图进入同步块，比如A线程获得synchronized锁，其他线程便处于阻塞状态</span><br><span class="line">         */</span><br><span class="line">        BLOCKED,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * </span><br><span class="line">         */</span><br><span class="line">        WAITING,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * </span><br><span class="line">         */</span><br><span class="line">        TIMED_WAITING,</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         * 终止线程状态</span><br><span class="line">         */</span><br><span class="line">        TERMINATED;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>根据Thread类提供的线程状态共有六种分别为NEW、RUNNABLE、BLOCKED、WAITING、TIMED_WAITING、TERMINATED，那么线程在着六种状态中对中断所产生的反应</p>
+<ol>
+<li>NEW、TERMINATED</li>
+</ol>
+<p>NEW代表线程状态并未调用start方法，没有启动；TERMINATED代表线程已经终止。在这两个状态中中断方法来中断线程是没有任何意义的</p>
+<ol start="2">
+<li>RUNNABLE</li>
+</ol>
+<p>线程处于运行状态，但是不一定所有处于RUNNABLE状态的线程都能获得CPU运行，在某个时间段，只能由一个线程占用CPU，那么其余的线程虽然状态是RUNNABLE，而我们处于RUNNABLE状态的线程在遭遇中断操作的时候只会设置该线程的中断标志位，并不会让线程实际中断，想要发现本线程已经被要求中断了则需要用程序去判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class InterruptTest &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 简易代码</span><br><span class="line">     *</span><br><span class="line">     * @param args</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        TreadInterrupt threadTest = new TreadInterrupt();</span><br><span class="line">        threadTest.start();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;线程状态为1:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为2:&quot; + threadTest.isInterrupted());</span><br><span class="line">        threadTest.interrupt();</span><br><span class="line">        System.out.println(&quot;线程状态为3:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为4:&quot; + threadTest.isInterrupted());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TreadInterrupt extends Thread &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true)&#123;</span><br><span class="line">                //System.out.println(&quot;运行中。。。。。&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">线程状态为1:RUNNABLE</span><br><span class="line">线程中断标志为2:false</span><br><span class="line">线程状态为3:RUNNABLE</span><br><span class="line">线程中断标志为4:true</span><br></pre></td></tr></table></figure>
+<p>上面结果显示即使我们设置了线程中断标识，但是线程的状态依然是RUNNABLE。很显然，处于RUNNBALE状态下的线程即便遇到中断操作，也只会设置中断标志位并不会实际中断线程运行。</p>
+<p>这里其实Java将这种权力交给了我们的程序，Java给我们提供了一个中断标志位，我们的程序可以通过if判断中断标志位是否被设置来中断我们的程序而不是系统强制的中断</p>
+<p>此时可以改写一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">static class TreadInterrupt extends Thread &#123;</span><br><span class="line"></span><br><span class="line">     @Override</span><br><span class="line">     public void run() &#123;</span><br><span class="line">         while (true)&#123;</span><br><span class="line">             if (Thread.currentThread().isInterrupted()) &#123;</span><br><span class="line">                 break;</span><br><span class="line">             &#125;</span><br><span class="line">             //System.out.println(&quot;运行中。。。。。&quot;);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>BLOCKED</li>
+</ol>
+<p>线程处于BLOCKED状态是与其他线程争夺锁资源失败，导致线程在某阻塞队列上，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class InterruptTest &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 简易代码</span><br><span class="line">     *</span><br><span class="line">     * @param args</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        TreadInterrupt threadTest = new TreadInterrupt();</span><br><span class="line">        threadTest.start();</span><br><span class="line"></span><br><span class="line">        TreadInterrupt threadTest2 = new TreadInterrupt();</span><br><span class="line">        threadTest2.start();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;线程状态为1:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为2:&quot; + threadTest.isInterrupted());</span><br><span class="line">        System.out.println(&quot;线程2状态为3:&quot; + threadTest2.getState());</span><br><span class="line">        System.out.println(&quot;线程2中断标志为4:&quot; + threadTest2.isInterrupted());</span><br><span class="line">        threadTest2.interrupt();</span><br><span class="line">        System.out.println(&quot;线程状态为5:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为6:&quot; + threadTest.isInterrupted());</span><br><span class="line">        System.out.println(&quot;线程2状态为7:&quot; + threadTest2.getState());</span><br><span class="line">        System.out.println(&quot;线程2中断标志为8:&quot; + threadTest2.isInterrupted());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TreadInterrupt extends Thread &#123;</span><br><span class="line"></span><br><span class="line">        public synchronized static void doSomething()&#123;</span><br><span class="line">             while (true)&#123;</span><br><span class="line"></span><br><span class="line">             &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            doSomething();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">线程状态为1:RUNNABLE</span><br><span class="line">线程中断标志为2:false</span><br><span class="line">线程状态为3:BLOCKED</span><br><span class="line">线程中断标志为4:false</span><br><span class="line">线程状态为5:RUNNABLE</span><br><span class="line">线程中断标志为6:false</span><br><span class="line">线程状态为7:BLOCKED</span><br><span class="line">线程中断标志为8:true</span><br></pre></td></tr></table></figure>
+<p>上面结果可以看出线程处于BLOCKED状态后，设置中断标识也是不会对线程本身造成影响，与RUNNABLE状态一样，给了我们程序更大的灵活性去判断和处理中断。</p>
+<ol start="4">
+<li>WAITING/TIMED_WAITING</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">public class InterruptTest &#123;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 简易代码</span><br><span class="line">     *</span><br><span class="line">     * @param args</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        TreadInterrupt threadTest = new TreadInterrupt();</span><br><span class="line">        threadTest.start();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;线程状态为1:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为2:&quot; + threadTest.isInterrupted());</span><br><span class="line">        threadTest.interrupt();</span><br><span class="line">        System.out.println(&quot;线程状态为5:&quot; + threadTest.getState());</span><br><span class="line">        System.out.println(&quot;线程中断标志为6:&quot; + threadTest.isInterrupted());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class TreadInterrupt extends Thread &#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            synchronized (this)&#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    wait();</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                    System.out.println(&quot;线程中断.....&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">线程状态为1:WAITING</span><br><span class="line">线程中断标志为2:false</span><br><span class="line">线程状态为5:WAITING</span><br><span class="line">线程中断标志为6:false</span><br><span class="line">线程中断.....</span><br><span class="line">java.lang.InterruptedException</span><br><span class="line">	at java.lang.Object.wait(Native Method)</span><br><span class="line">	at java.lang.Object.wait(Object.java:502)</span><br><span class="line">	at com.laifulin.example.thread.InterruptTest$TreadInterrupt.run(InterruptTest.java:67)</span><br></pre></td></tr></table></figure>
+<p>从运行结果看，当前程thread启动之后就被挂起到该线程对象的条件队列上，然后我们调用interrupt方法对该线程进行中断，输出了我们在catch中的输出语句，显然是捕获了InterruptedException异常，接着就看到该线程的中断标志位被清空。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>根据上面分析，我们java为我们提供的中断线程方法只是设置中断信号，将线程何时中断如何中断的工作交给程序，给了我们程序更大的灵活性去判断和处理中断。</p>
+<p>同时，不同线程状态对线程中断的敏感度不一样，NEW、TERMINATED对于中断操作几乎是屏蔽的；RUNNABLE和BLOCKED类似，对于中断操作只是设置中断标志位并没有强制终止线程，对于线程的终止权利依然在程序手中；WAITING/TIMED_WAITING状态下的线程对于中断操作是敏感的，他们会抛出异常并清空中断标志位</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2019/03/17/JAVA并发之线程中断/" data-id="cjtcocgx4000l8a33m8ncyare" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2019/03/17/JAVA并发之线程中断/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-Synchronize实现原理" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/21/Synchronize实现原理/" class="article-date">
@@ -237,7 +326,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/" data-id="cjseqlk2i000opj33nzl5p5qr" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/" data-id="cjtcocgxs000q8a33twnk6fuy" class="article-share-link">分享到</a>
       
 
       
@@ -393,7 +482,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/" data-id="cjseqlk1x0005pj338ylnm5zh" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/" data-id="cjtcocgwr00088a33qfpyhji1" class="article-share-link">分享到</a>
       
 
       
@@ -497,7 +586,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjseqlk1w0004pj3320ihibwy" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjtcocgwn00058a33n4jszsr1" class="article-share-link">分享到</a>
       
 
       
@@ -585,7 +674,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjseqlk2g000lpj33yve6sex7" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjtcocgx5000m8a330hfbdmfe" class="article-share-link">分享到</a>
       
 
       
@@ -654,7 +743,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjseqlk1v0003pj333sdrhgko" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjtcocgwl00048a331hlrbehr" class="article-share-link">分享到</a>
       
 
       
@@ -787,7 +876,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjseqlk200008pj33h5pfljuh" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjtcocgwt00098a333it99a2p" class="article-share-link">分享到</a>
       
 
       
@@ -884,7 +973,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjseqlk2h000mpj33n6inu4ac" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjtcocgxt000r8a33bzohgayq" class="article-share-link">分享到</a>
       
 
       
@@ -993,7 +1082,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjseqlk1g0000pj33ca9tc08s" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjtcocgwb00008a33aqxpioxp" class="article-share-link">分享到</a>
       
 
       
@@ -1142,7 +1231,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjseqlk1r0001pj33ccs8nsjo" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjtcocgwg00018a33q35v3q62" class="article-share-link">分享到</a>
       
 
       
@@ -1160,52 +1249,11 @@ INNODB还需要维护MVCC一致
 
 
   
-    <article id="post-Hexo-Github-搭建个人博客" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/11/Hexo-Github-搭建个人博客/" class="article-date">
-  <time datetime="2018-11-11T15:39:25.000Z" itemprop="datePublished">2018-11-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/11/Hexo-Github-搭建个人博客/">Hexo Github 搭建个人博客</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjseqlk210009pj3393mldtko" class="article-share-link">分享到</a>
-      
-
-      
-        <a href="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/#ds-thread" class="article-comment-link">评论</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/其他/">其他</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
 
 
-
-  
-
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+  </nav>
 </section>
       
       <aside id="sidebar">
@@ -1216,7 +1264,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1225,7 +1273,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -1234,7 +1282,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -1244,6 +1292,10 @@ INNODB还需要维护MVCC一致
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/03/17/JAVA并发之线程中断/">JAVA并发之线程中断</a>
+          </li>
         
           <li>
             <a href="/2019/02/21/Synchronize实现原理/">Synchronize实现原理</a>
@@ -1259,10 +1311,6 @@ INNODB还需要维护MVCC一致
         
           <li>
             <a href="/2018/12/13/Java-Map集合/">Java HashMap</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/05/JVM性能调优与常用监控工具/">JVM性能调优与常用监控工具</a>
           </li>
         
       </ul>
