@@ -74,6 +74,155 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-Docker常用命令" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/17/Docker常用命令/" class="article-date">
+  <time datetime="2018-11-17T14:23:37.000Z" itemprop="datePublished">2018-11-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/17/Docker常用命令/">Docker常用命令</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="镜像管理类命令"><a href="#镜像管理类命令" class="headerlink" title="镜像管理类命令"></a>镜像管理类命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查看命令参数：docker [<span class="built_in">command</span>] --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<h4 id="docker-build-命令"><a href="#docker-build-命令" class="headerlink" title="docker build 命令"></a>docker build 命令</h4><p>docker build 命令用于使用 Dockerfile 创建镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build [OPTIONS] PATH | URL | -</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> 在 Docker 守护进程执行 Dockerfile 中的指令前，首先会对 Dockerfile 进行语法检查，有语法错误时会返回</p>
+</blockquote>
+<ul>
+<li>-f :指定要使用的Dockerfile路径；</li>
+<li>–pull :尝试去更新镜像的新版本；</li>
+<li>–tag, -t: 镜像的名字及标签，通常 name:tag 或者 name </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// **使用当前目录下的Dockerfile文件**，创建标签为lin/ubuntu:v1的镜像</span><br><span class="line">docker build -t lin/ubuntu:v1 .</span><br><span class="line"></span><br><span class="line">// 通过 -f 指定Dockerfile 文件的位置，创建镜像</span><br><span class="line">docker build -f /path/to/a/Dockerfile .</span><br></pre></td></tr></table></figure>
+<h4 id="docker-images"><a href="#docker-images" class="headerlink" title="docker images"></a>docker images</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images [OPTIONS] [REPOSITORY[:TAG]]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-a :列出本地所有的镜像/不加默认展示所以镜像</li>
+<li>-f :显示满足条件的镜像；</li>
+<li>-q :只显示镜像ID</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像列表</span><br><span class="line">docker images </span><br><span class="line"></span><br><span class="line">// 列出REPOSITORY为centos的所以镜像</span><br><span class="line">docker images centos</span><br></pre></td></tr></table></figure>
+<h4 id="docker-rmi"><a href="#docker-rmi" class="headerlink" title="docker rmi"></a>docker rmi</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi [OPTIONS] IMAGE [IMAGE...]</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-f :强制删除</li>
+<li>–no-prune :不移除该镜像的过程镜像，默认移除</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 强制删除本地镜像</span><br><span class="line">docker rmi -f centos</span><br></pre></td></tr></table></figure>
+<h4 id="docker-tag"><a href="#docker-tag" class="headerlink" title="docker tag"></a>docker tag</h4><p>标记本地镜像，将其归入某一仓库<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag IMAGE_ID REPOSITORY:TAG</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 修改本地镜像标签</span><br><span class="line">docker tag 75835a67d134 daocloud.io/centos:latest1</span><br></pre></td></tr></table></figure>
+<h4 id="docker-history"><a href="#docker-history" class="headerlink" title="docker history"></a>docker history</h4><p>查看指定镜像的创建历史<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> [OPTIONS] IMAGE</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>-H :以可读的格式打印镜像大小和日期，默认为true</li>
+<li>—no-trunc :显示完整的提交记录</li>
+<li>-q :仅列出提交记录ID</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像75835a67d134的创建历史</span><br><span class="line">docker history -q 75835a67d134</span><br></pre></td></tr></table></figure>
+<h3 id="容器操作"><a href="#容器操作" class="headerlink" title="容器操作"></a>容器操作</h3><h4 id="docker-ps"><a href="#docker-ps" class="headerlink" title="docker ps"></a>docker ps</h4><p>列出容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps [OPTIONS]  // 默认列出运行中的容器</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-a :显示所有的容器，包括未运行的。</p>
+</li>
+<li><p>-f :根据条件过滤显示的内容。</p>
+</li>
+<li><p>–format :指定返回值的模板文件。</p>
+</li>
+<li><p>-l :显示最近创建的容器。</p>
+</li>
+<li><p>-n :列出最近创建的n个容器。</p>
+</li>
+<li><p>–no-trunc :不截断输出。</p>
+</li>
+<li><p>-q :静默模式，只显示容器编号。</p>
+</li>
+<li><p>-s :显示总的文件大小</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//列出所有运行和未运行的容器</span><br><span class="line">docker ps -a</span><br></pre></td></tr></table></figure>
+<h4 id="docker-attach"><a href="#docker-attach" class="headerlink" title="docker attach"></a>docker attach</h4><p>连接到正在运行中的容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
+<h4 id="docker-run"><a href="#docker-run" class="headerlink" title="docker run"></a>docker run</h4><p>创建一个新的容器并运行一个命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>-i: 以交互模式运行容器，通常与 -t 同时使用</li>
+<li>-p: 端口映射，格式为：主机(宿主)端口:容器端口</li>
+<li>-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用</li>
+<li>–name=”nginx-lb”: 为容器指定一个名称</li>
+</ul>
+<h4 id="docker-start-stop-restart"><a href="#docker-start-stop-restart" class="headerlink" title="docker start/stop/restart"></a>docker start/stop/restart</h4><p>启动/停止/重启一个容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker start/stop/restart [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
+<h4 id="docker-rm"><a href="#docker-rm" class="headerlink" title="docker rm"></a>docker rm</h4><p>删除一个或多少容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm [OPTIONS] CONTAINER [CONTAINER...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-f :通过SIGKILL信号强制删除一个运行中的容器</p>
+</li>
+<li><p>-l :移除容器间的网络连接，而非容器本身</p>
+</li>
+<li><p>-v :-v 删除与容器关联的卷</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm mynginx</span><br></pre></td></tr></table></figure>
+<h4 id="docker-exec"><a href="#docker-exec" class="headerlink" title="docker exec"></a>docker exec</h4><p>在运行的容器中执行命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> [OPTIONS] CONTAINER COMMAND [ARG...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>-d :分离模式: 在后台运行</p>
+</li>
+<li><p>-i :即使没有附加也保持STDIN 打开</p>
+</li>
+<li><p>-t :分配一个伪终端</p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i -t  mynginx /bin/bash</span><br></pre></td></tr></table></figure>
+<h3 id="更换docker仓库地址-–-如更新阿里云仓库"><a href="#更换docker仓库地址-–-如更新阿里云仓库" class="headerlink" title="更换docker仓库地址 – 如更新阿里云仓库"></a>更换docker仓库地址 – 如更新阿里云仓库</h3><blockquote>
+<p>   docker-machine ssh [machine-name] 进入VM bash</p>
+</blockquote>
+<blockquote>
+<p>   sudo vi /var/lib/boot2docker/profile 修改配置文件</p>
+</blockquote>
+<blockquote>
+<p>   在–label provider=virtualbox的下一行添加–registry-mirror <a href="https://xxxxxxxx.mirror.aliyuncs.com" target="_blank" rel="noopener">https://xxxxxxxx.mirror.aliyuncs.com</a></p>
+</blockquote>
+<blockquote>
+<p>   重启docker服务:/etc/init.d/docker restart 或者重启VM docker-machine restart</p>
+</blockquote>
+<h3 id="docker-machine"><a href="#docker-machine" class="headerlink" title="docker-machine"></a>docker-machine</h3><blockquote>
+<pre><code>查看宿主机ip docker-machine ip default
+</code></pre></blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjumsk9m70001al33sulbkuym" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2018/11/17/Docker常用命令/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-Hexo-Github-搭建个人博客" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/11/11/Hexo-Github-搭建个人博客/" class="article-date">
@@ -101,7 +250,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjtcom4mx000pdc33qiw9sjrk" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/11/Hexo-Github-搭建个人博客/" data-id="cjumsk9mb0003al33jqpu7i06" class="article-share-link">分享到</a>
       
 
       
@@ -134,7 +283,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -143,7 +292,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/mysql/" style="font-size: 16.67px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -152,7 +301,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -162,6 +311,10 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/18/JAVA类加载机制/">JAVA类加载机制</a>
+          </li>
         
           <li>
             <a href="/2019/03/17/JAVA并发之线程中断/">JAVA并发之线程中断</a>
@@ -177,10 +330,6 @@
         
           <li>
             <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/Java-Map集合/">Java HashMap</a>
           </li>
         
       </ul>

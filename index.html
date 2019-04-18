@@ -74,6 +74,193 @@
     <div class="outer">
       <section id="main">
   
+    <article id="post-JAVA类加载机制" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/04/18/JAVA类加载机制/" class="article-date">
+  <time datetime="2019-04-18T15:08:24.000Z" itemprop="datePublished">2019-04-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/18/JAVA类加载机制/">JAVA类加载机制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><blockquote>
+<p> 类从被加载到虚拟机内存中开始，到卸载出内存为止，它的整个生命周期包括：加载、验证、准备、解析、初始化、使用、卸载这个七个阶段。</p>
+</blockquote>
+<h3 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h3><blockquote>
+<p> 由类加载器负责根据一个类的全限定名来读取此类的二进制字节流到JVM内部，并存储在运行时内存区的方法区，然后将其转换为一个与目标类型对应的java.lang.Class对象实例。</p>
+</blockquote>
+<ul>
+<li>通过类的全限定名来获取该类二进制字节流（可以从CLass文件、网络、动态生成等渠道获取）；</li>
+<li>将该类的二进制字节流代表的静态存储结构转化为方法区的运行时数据结构；即是将类的信息、静态变量、字节码、常量等等这些class中的内容加入方法区中；</li>
+<li>在内存中生成一个代表该类的java.lang.Class对象，作为方法区这个类的数据访问入口；</li>
+</ul>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><blockquote>
+<p> 验证阶段主要目的是确保类的二进制字节流中包含的信息符合当前虚拟机的要求，并且不会危害到虚拟机自身的安全</p>
+</blockquote>
+<ul>
+<li>文件格式验证</li>
+<li>元数据验证</li>
+<li>字节码验证</li>
+<li>符号引用验证</li>
+</ul>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><blockquote>
+<p> 准备阶段是为类变量分配内存并设置初始值，这些变量所使用的内存都在方法区中分配</p>
+</blockquote>
+<p>此处要区分类变量（静态变量）与实例变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class TestValue &#123;</span><br><span class="line">    </span><br><span class="line">    private static Integer STATIC_VALUE = 10;</span><br><span class="line">    </span><br><span class="line">    private Integer value = 10;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 静态变量直接通过类调用</span><br><span class="line">        System.out.println(TestValue.STATIC_VALUE);</span><br><span class="line"></span><br><span class="line">        // 实例变量需要通过类的实例调用</span><br><span class="line">        TestValue t = new TestValue();</span><br><span class="line">        System.out.println(t.value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>类变量（静态变量）</strong>：静态变量不属于某个实例对象，而是属于类，所以也称为类变量，只要程序加载了类的字节码，不用创建任何实例对象，静态变量就会被分配空间，静态变量就可以被使用了</p>
+<p><strong>实例变量</strong>：实例变量属于某个对象的属性，必须创建了实例对象，其中的实例变量才会被分配空间，才能使用这个实例变量</p>
+<blockquote>
+<p> 这个阶段赋初始值的变量是指没有被final修饰的static变量，例如上边STATIC_VALUE，该阶段会给它赋值为0而不是10，赋值为10实在初始化阶段进行的。</p>
+</blockquote>
+<blockquote>
+</blockquote>
+<p>各数据类型初始值：</p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>初始值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>long</td>
+<td>0L</td>
+</tr>
+<tr>
+<td>short</td>
+<td>(short) 0</td>
+</tr>
+<tr>
+<td>char</td>
+<td>‘\u0000’</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>(byte) 0</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>float</td>
+<td>0.0f</td>
+</tr>
+<tr>
+<td>double</td>
+<td>0.0d</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><blockquote>
+<p> 解析阶段主要是将虚拟机内常量池中的符号引用替换为直接引用，本阶段目的是确保类与类之间相互引用的正确性，完成内存结构布局</p>
+</blockquote>
+<p><strong>字面量</strong></p>
+<p>字面量是指源代码中直接表示的一个固定值，很难说明的一个东西，反正理解为一眼就能知道值得东西。<br><br>比如：int a = 10，意思为把字面量10赋值给a；String str = “abc”，意思为把字面量abc赋值给str</p>
+<p>java中的字面量：整数字面量、浮点型字面量、布尔型字面量、字符字面量、字符串字面量</p>
+<p><strong>符号引用</strong></p>
+<p>符号引用是以一组符号来描述所引用的目标，符号可以是任何形式的字面量，只要使用时能够无歧义的定位到目标即可。<br><br>在Java中，将一个类编译成为class文件。在编译时，java类并不知道引用类的实际内存地址，因此只能用符号引用来代替。</p>
+<p><strong>直接引用</strong></p>
+<ul>
+<li>直接指向目标的指针。(个人理解为：指向方法区中类对象， 类变量和类方法的指针)</li>
+<li>相对偏移量。(指向实例的变量, 方法的指针)</li>
+<li>一个间接定位到对象的句柄。</li>
+</ul>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><blockquote>
+<p> 初始化阶段是执行类构造器<clinit>()方法的过程。而且只有一个类被直接引用，才会触发类的初始化。</clinit></p>
+</blockquote>
+<p>直接引用的场景：</p>
+<ul>
+<li>通过new关键字实例化对象、读取或者设置静态变量、调用类的静态方法</li>
+<li>通过反射执行上面三个行为</li>
+<li>初始化子类的时候，父类也会触发初始化</li>
+<li>作为程序入口直接运行（直接调用main方法）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">public class InitClass &#123;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        System.out.println(&quot;init class&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static String a = null;</span><br><span class="line"></span><br><span class="line">    public static void say()&#123;</span><br><span class="line">        System.out.println(&quot;say method&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception&#123;</span><br><span class="line">        // 通过new关键字实例化对象、读取或者设置静态变量、调用类的静态方法</span><br><span class="line">        // InitClass initClass = new InitClass();</span><br><span class="line">        // System.out.println(InitClass.a);</span><br><span class="line">        // InitClass.say();</span><br><span class="line"></span><br><span class="line">        // 通过反射执行上面上个行为</span><br><span class="line">        Class cl = InitClass.class;</span><br><span class="line">        // Object o = cl.newInstance();</span><br><span class="line">        // Field field = cl.getDeclaredField(&quot;a&quot;);</span><br><span class="line">        // field.get(null);</span><br><span class="line">        </span><br><span class="line">        // Method md = cl.getDeclaredMethod(&quot;say&quot;);</span><br><span class="line">        // md.invoke(null,null);</span><br><span class="line">        </span><br><span class="line">        // 初始化子类出发父类初始化不写了</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方法-与-方法"><a href="#方法-与-方法" class="headerlink" title="()方法 与 ()方法"></a><clinit>()方法 与 <init>()方法</init></clinit></h4><p><clinit>()是类构造器方法（<strong>该方法只能被jvm调用, 专门承担类变量的初始化工作</strong>）</clinit></p>
+<ul>
+<li><clinit>()是由编译器自动收集类中的所有类变量的赋值动作和静态语句块static{}中的语句并产生的，编译器收集的顺序是由语句在源文件中出现的顺序所决定的，静态语句块只能访问到定义在静态语句块之前的变量，定义在它之后的变量，在前面的静态语句块可以赋值，但是不能访问</clinit></li>
+<li>虚拟机会保证在子类的<clinit>()方法执行之前，父类的<clinit>()方法已经执行完毕</clinit></clinit></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class TestValue &#123;</span><br><span class="line"></span><br><span class="line">    private static TestValue test; // &lt;clinit&gt;</span><br><span class="line"></span><br><span class="line">    private static String name = &quot;name&quot;; // &lt;clinit&gt;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        test = new TestValue(); // &lt;clinit&gt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private String testName;</span><br><span class="line"></span><br><span class="line">    private TestValue() &#123;</span><br><span class="line">        testName = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(test.testName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><init>()方法是<strong>instance实例构造器</strong>，对非静态变量解析初始化</init></p>
+<p>实例化一个类的途径：</p>
+<ul>
+<li>调用new操作符</li>
+<li>调用 Class 或 java.lang.reflect.Constructor 对象的newInstance()方法</li>
+<li>调用任何现有对象的clone()方法</li>
+<li>通过 java.io.ObjectInputStream 类的 getObject() 方法反序列化</li>
+</ul>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><blockquote>
+<p> 类的生命周期绝大部分时间都是再使用阶段，类的使用主要包括主动引用与被动引用</p>
+</blockquote>
+<p>主动引用上面提到的直接引用，被动引用如下：</p>
+<ul>
+<li>引用父类静态字段，只会触发父类的初始化，子类不会初始化</li>
+<li>定义数组，不会引起类初始化</li>
+<li>引用类常量不会触发类初始化</li>
+</ul>
+<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><h3 id="番外篇"><a href="#番外篇" class="headerlink" title="番外篇"></a>番外篇</h3><p>实例化一个对象过程中内存的分配</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">// 定义一个简单的类</span><br><span class="line">public class Student &#123;</span><br><span class="line"></span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    private int age;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getAge() &#123;</span><br><span class="line">        return age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setAge(int age) &#123;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void getInfo()&#123;</span><br><span class="line">        System.out.println(&quot;name:&quot; + name + &quot;-- age:&quot; + age);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对象属于引用数据类型，它与基本的数据类型最大不同在于引用数据类型需要进行内存分配，而关键字new的主要功能就是开辟内存空间。那么实例化一个对象这个过程其中的堆栈内存空间又是如何分配的呢？</p>
+<p>堆栈内存：</p>
+<ul>
+<li>　在函数中定义的一些基本类型的变量和对象的引用变量都在函数的栈内存中分配</li>
+<li>　堆内存用来存放由new创建的对象和数组等</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 声明并实例化对象,并且赋值</span><br><span class="line">        Student s1 = new Student();</span><br><span class="line">        s1.setName(&quot;lin&quot;);</span><br><span class="line">        s1.setAge(16);</span><br><span class="line">        s1.getInfo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>声明对象会在堆中为对象分配内存，并且在栈保存该对象的引用，再执行赋值操作</p>
+<p><img src="/2019/04/18/JAVA类加载机制/set_value.png" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Test &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 分步操作</span><br><span class="line">        // 声明对象</span><br><span class="line">        Student s2;</span><br><span class="line">        // 实例化对象</span><br><span class="line">        s2 = new Student();</span><br><span class="line">        s2.setName(&quot;lin2&quot;);</span><br><span class="line">        s2.setAge(18);</span><br><span class="line">        s2.getInfo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/04/18/JAVA类加载机制/change_value.png" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 更变s1的引用</span><br><span class="line">s1 = s2;</span><br><span class="line">s1.setAge(22);</span><br><span class="line">s1.getInfo();</span><br><span class="line">s2.getInfo();</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/04/18/JAVA类加载机制/set_value1.png" alt="image"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://laifulin.github.io/2019/04/18/JAVA类加载机制/" data-id="cjumsk9mx000mal33pti51umu" class="article-share-link">分享到</a>
+      
+
+      
+        <a href="http://laifulin.github.io/2019/04/18/JAVA类加载机制/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-JAVA并发之线程中断" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/17/JAVA并发之线程中断/" class="article-date">
@@ -145,7 +332,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/03/17/JAVA并发之线程中断/" data-id="cjtcom4mf000adc33q8v0kkmq" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/03/17/JAVA并发之线程中断/" data-id="cjumsk9mw000lal33gdlwue7p" class="article-share-link">分享到</a>
       
 
       
@@ -326,7 +513,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/" data-id="cjtcom4mu000kdc33l0edkvaa" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/21/Synchronize实现原理/" data-id="cjumsk9n4000qal33l6vpombj" class="article-share-link">分享到</a>
       
 
       
@@ -482,7 +669,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/" data-id="cjtcom4md0007dc33k4vxw5vx" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/19/MySQL-ACID-事务模型与隔离级别/" data-id="cjumsk9mj0008al33y1ox9ur8" class="article-share-link">分享到</a>
       
 
       
@@ -586,7 +773,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjtcom4mc0006dc3386zhylu6" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/" data-id="cjumsk9mh0005al33piwinho4" class="article-share-link">分享到</a>
       
 
       
@@ -674,7 +861,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjtcom4mk000bdc332eyt4tj6" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/13/Java-Map集合/" data-id="cjumsk9mz000oal33jbkm59w2" class="article-share-link">分享到</a>
       
 
       
@@ -743,7 +930,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjtcom4lu0001dc33dsshvhlf" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/12/05/JVM性能调优与常用监控工具/" data-id="cjumsk9mg0004al338wo3uj20" class="article-share-link">分享到</a>
       
 
       
@@ -876,7 +1063,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjtcom4me0009dc33orxecuxx" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/28/Mysql常用指令/" data-id="cjumsk9mk0009al33o56vpjan" class="article-share-link">分享到</a>
       
 
       
@@ -973,7 +1160,7 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjtcom4mv000ldc33u2ff3v5b" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/18/dubbo群容错与负载均衡策略/" data-id="cjumsk9n5000sal33moodptdf" class="article-share-link">分享到</a>
       
 
       
@@ -1082,160 +1269,11 @@ INNODB还需要维护MVCC一致
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjtcom4lr0000dc33rf25cxjz" class="article-share-link">分享到</a>
+        <a data-url="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/" data-id="cjumsk9m40000al3390n1beue" class="article-share-link">分享到</a>
       
 
       
         <a href="http://laifulin.github.io/2018/11/17/Dockerfile配置用法/#ds-thread" class="article-comment-link">评论</a>
-      
-
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-Docker常用命令" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/17/Docker常用命令/" class="article-date">
-  <time datetime="2018-11-17T14:23:37.000Z" itemprop="datePublished">2018-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/17/Docker常用命令/">Docker常用命令</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="镜像管理类命令"><a href="#镜像管理类命令" class="headerlink" title="镜像管理类命令"></a>镜像管理类命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">查看命令参数：docker [<span class="built_in">command</span>] --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-<h4 id="docker-build-命令"><a href="#docker-build-命令" class="headerlink" title="docker build 命令"></a>docker build 命令</h4><p>docker build 命令用于使用 Dockerfile 创建镜像</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build [OPTIONS] PATH | URL | -</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p> 在 Docker 守护进程执行 Dockerfile 中的指令前，首先会对 Dockerfile 进行语法检查，有语法错误时会返回</p>
-</blockquote>
-<ul>
-<li>-f :指定要使用的Dockerfile路径；</li>
-<li>–pull :尝试去更新镜像的新版本；</li>
-<li>–tag, -t: 镜像的名字及标签，通常 name:tag 或者 name </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// **使用当前目录下的Dockerfile文件**，创建标签为lin/ubuntu:v1的镜像</span><br><span class="line">docker build -t lin/ubuntu:v1 .</span><br><span class="line"></span><br><span class="line">// 通过 -f 指定Dockerfile 文件的位置，创建镜像</span><br><span class="line">docker build -f /path/to/a/Dockerfile .</span><br></pre></td></tr></table></figure>
-<h4 id="docker-images"><a href="#docker-images" class="headerlink" title="docker images"></a>docker images</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images [OPTIONS] [REPOSITORY[:TAG]]</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>-a :列出本地所有的镜像/不加默认展示所以镜像</li>
-<li>-f :显示满足条件的镜像；</li>
-<li>-q :只显示镜像ID</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像列表</span><br><span class="line">docker images </span><br><span class="line"></span><br><span class="line">// 列出REPOSITORY为centos的所以镜像</span><br><span class="line">docker images centos</span><br></pre></td></tr></table></figure>
-<h4 id="docker-rmi"><a href="#docker-rmi" class="headerlink" title="docker rmi"></a>docker rmi</h4><p>列出本地处在的镜像<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi [OPTIONS] IMAGE [IMAGE...]</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>-f :强制删除</li>
-<li>–no-prune :不移除该镜像的过程镜像，默认移除</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 强制删除本地镜像</span><br><span class="line">docker rmi -f centos</span><br></pre></td></tr></table></figure>
-<h4 id="docker-tag"><a href="#docker-tag" class="headerlink" title="docker tag"></a>docker tag</h4><p>标记本地镜像，将其归入某一仓库<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag IMAGE_ID REPOSITORY:TAG</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 修改本地镜像标签</span><br><span class="line">docker tag 75835a67d134 daocloud.io/centos:latest1</span><br></pre></td></tr></table></figure>
-<h4 id="docker-history"><a href="#docker-history" class="headerlink" title="docker history"></a>docker history</h4><p>查看指定镜像的创建历史<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> [OPTIONS] IMAGE</span><br></pre></td></tr></table></figure></p>
-<ul>
-<li>-H :以可读的格式打印镜像大小和日期，默认为true</li>
-<li>—no-trunc :显示完整的提交记录</li>
-<li>-q :仅列出提交记录ID</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 查看本地镜像75835a67d134的创建历史</span><br><span class="line">docker history -q 75835a67d134</span><br></pre></td></tr></table></figure>
-<h3 id="容器操作"><a href="#容器操作" class="headerlink" title="容器操作"></a>容器操作</h3><h4 id="docker-ps"><a href="#docker-ps" class="headerlink" title="docker ps"></a>docker ps</h4><p>列出容器</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps [OPTIONS]  // 默认列出运行中的容器</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>-a :显示所有的容器，包括未运行的。</p>
-</li>
-<li><p>-f :根据条件过滤显示的内容。</p>
-</li>
-<li><p>–format :指定返回值的模板文件。</p>
-</li>
-<li><p>-l :显示最近创建的容器。</p>
-</li>
-<li><p>-n :列出最近创建的n个容器。</p>
-</li>
-<li><p>–no-trunc :不截断输出。</p>
-</li>
-<li><p>-q :静默模式，只显示容器编号。</p>
-</li>
-<li><p>-s :显示总的文件大小</p>
-</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//列出所有运行和未运行的容器</span><br><span class="line">docker ps -a</span><br></pre></td></tr></table></figure>
-<h4 id="docker-attach"><a href="#docker-attach" class="headerlink" title="docker attach"></a>docker attach</h4><p>连接到正在运行中的容器</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
-<h4 id="docker-run"><a href="#docker-run" class="headerlink" title="docker run"></a>docker run</h4><p>创建一个新的容器并运行一个命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>-i: 以交互模式运行容器，通常与 -t 同时使用</li>
-<li>-p: 端口映射，格式为：主机(宿主)端口:容器端口</li>
-<li>-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用</li>
-<li>–name=”nginx-lb”: 为容器指定一个名称</li>
-</ul>
-<h4 id="docker-start-stop-restart"><a href="#docker-start-stop-restart" class="headerlink" title="docker start/stop/restart"></a>docker start/stop/restart</h4><p>启动/停止/重启一个容器</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker start/stop/restart [OPTIONS] CONTAINER</span><br></pre></td></tr></table></figure>
-<h4 id="docker-rm"><a href="#docker-rm" class="headerlink" title="docker rm"></a>docker rm</h4><p>删除一个或多少容器</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm [OPTIONS] CONTAINER [CONTAINER...]</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>-f :通过SIGKILL信号强制删除一个运行中的容器</p>
-</li>
-<li><p>-l :移除容器间的网络连接，而非容器本身</p>
-</li>
-<li><p>-v :-v 删除与容器关联的卷</p>
-</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm mynginx</span><br></pre></td></tr></table></figure>
-<h4 id="docker-exec"><a href="#docker-exec" class="headerlink" title="docker exec"></a>docker exec</h4><p>在运行的容器中执行命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> [OPTIONS] CONTAINER COMMAND [ARG...]</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>-d :分离模式: 在后台运行</p>
-</li>
-<li><p>-i :即使没有附加也保持STDIN 打开</p>
-</li>
-<li><p>-t :分配一个伪终端</p>
-</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i -t  mynginx /bin/bash</span><br></pre></td></tr></table></figure>
-<h3 id="更换docker仓库地址-–-如更新阿里云仓库"><a href="#更换docker仓库地址-–-如更新阿里云仓库" class="headerlink" title="更换docker仓库地址 – 如更新阿里云仓库"></a>更换docker仓库地址 – 如更新阿里云仓库</h3><blockquote>
-<p>   docker-machine ssh [machine-name] 进入VM bash</p>
-</blockquote>
-<blockquote>
-<p>   sudo vi /var/lib/boot2docker/profile 修改配置文件</p>
-</blockquote>
-<blockquote>
-<p>   在–label provider=virtualbox的下一行添加–registry-mirror <a href="https://xxxxxxxx.mirror.aliyuncs.com" target="_blank" rel="noopener">https://xxxxxxxx.mirror.aliyuncs.com</a></p>
-</blockquote>
-<blockquote>
-<p>   重启docker服务:/etc/init.d/docker restart 或者重启VM docker-machine restart</p>
-</blockquote>
-<h3 id="docker-machine"><a href="#docker-machine" class="headerlink" title="docker-machine"></a>docker-machine</h3><blockquote>
-<pre><code>查看宿主机ip docker-machine ip default
-</code></pre></blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      
-        <a data-url="http://laifulin.github.io/2018/11/17/Docker常用命令/" data-id="cjtcom4mw000ndc33ipuq2n2n" class="article-share-link">分享到</a>
-      
-
-      
-        <a href="http://laifulin.github.io/2018/11/17/Docker常用命令/#ds-thread" class="article-comment-link">评论</a>
       
 
       
@@ -1264,7 +1302,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java集合/">Java集合</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dobbo/">dobbo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/其他/">其他</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1273,7 +1311,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 15px;">docker</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
+      <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Java集合/" style="font-size: 10px;">Java集合</a> <a href="/tags/dobbo/" style="font-size: 10px;">dobbo</a> <a href="/tags/docker/" style="font-size: 13.33px;">docker</a> <a href="/tags/mysql/" style="font-size: 16.67px;">mysql</a> <a href="/tags/其他/" style="font-size: 10px;">其他</a>
     </div>
   </div>
 
@@ -1282,7 +1320,7 @@ INNODB还需要维护MVCC一致
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -1292,6 +1330,10 @@ INNODB还需要维护MVCC一致
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/04/18/JAVA类加载机制/">JAVA类加载机制</a>
+          </li>
         
           <li>
             <a href="/2019/03/17/JAVA并发之线程中断/">JAVA并发之线程中断</a>
@@ -1307,10 +1349,6 @@ INNODB还需要维护MVCC一致
         
           <li>
             <a href="/2019/02/16/MyISAM与InnoDB两者之间区别与选择，性能对比/">MyISAM与InnoDB两者之间区别与选择，性能对比</a>
-          </li>
-        
-          <li>
-            <a href="/2018/12/13/Java-Map集合/">Java HashMap</a>
           </li>
         
       </ul>
